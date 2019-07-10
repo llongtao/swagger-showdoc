@@ -1,26 +1,23 @@
-package com.lerry.swaggershowdoc.web;
+package com.llt.swaggershowdoc.web;
 
-import com.lerry.swaggershowdoc.util.GitUtils;
-import com.lerry.swaggershowdoc.util.OkHttpUtil;
-import com.lerry.swaggershowdoc.util.SwaggerUtils;
+import com.llt.swaggershowdoc.models.Swagger2;
+import com.llt.swaggershowdoc.util.GitUtils;
+import com.llt.swaggershowdoc.util.OkHttpUtil;
+import com.llt.swaggershowdoc.util.SwaggerUtils;
 import io.swagger.models.Swagger;
 import io.swagger.parser.Swagger20Parser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
 @Controller
@@ -57,9 +54,9 @@ public class ApidocController {
                 String swaggerDoc;
                 swaggerDoc = okHttpUtil.get("http://" + swaggerUrl + "/v2/api-docs", null);
 
-
+//ExamplesUtil.generateRequestExampleMap()
                 Swagger swagger = new Swagger20Parser().parse(swaggerDoc);
-                SwaggerUtils.updateToShowDoc(showDocUrl, apiKey, apiToken, swagger, moduleName);
+                SwaggerUtils.updateToShowDoc(showDocUrl, apiKey, apiToken, new Swagger2(swagger), moduleName);
             }
             return ResponseEntity.ok("同步成功!");
         } catch (IOException e) {

@@ -1,9 +1,7 @@
-package com.lerry.swaggershowdoc.util;
+package com.llt.swaggershowdoc.util;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lerry.swaggershowdoc.swagger.XforcceSwagger2MarkupConverter;
-import io.github.swagger2markup.GroupBy;
+import com.llt.swaggershowdoc.swagger.XforcceSwagger2MarkupConverter;
+
 import io.github.swagger2markup.Language;
 import io.github.swagger2markup.Swagger2MarkupConfig;
 import io.github.swagger2markup.Swagger2MarkupConverter;
@@ -12,22 +10,14 @@ import io.github.swagger2markup.markup.builder.MarkupLanguage;
 import io.swagger.models.*;
 import io.swagger.models.parameters.BodyParameter;
 import io.swagger.models.parameters.Parameter;
-import io.swagger.models.properties.ArrayProperty;
-import io.swagger.models.properties.ObjectProperty;
-import io.swagger.models.properties.Property;
-import io.swagger.models.properties.RefProperty;
-import io.swagger.parser.SwaggerParser;
-import io.swagger.util.Json;
-import io.swagger.util.Yaml;
+import io.swagger.models.properties.*;
 import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -126,31 +116,31 @@ public class SwaggerUtils {
             getParAndChangeId(swagger, builder, path.getPatch().getResponses());
         }
 
-        int index;
-        while ((index = builder.indexOf("<a id=\"definitions\"></a>")) > 0) {
-            builder.replace(index, index + 31, Strings.EMPTY);
-        }
-        int indexS;
-
-        while ((indexS = builder.indexOf("**样例** : `[")) > 0) {
-            int indexE = builder.indexOf(" ]`|", indexS);
-
-            if (indexE < 0) {
-                continue;
-            }
-            builder.replace(indexS + 8, indexE + 3, Strings.EMPTY);
-        }
-        while ((indexS = builder.indexOf("**样例** : `\"[")) > 0) {
-            int indexE = builder.indexOf(")\"`|", indexS);
-            if (indexE < 0) {
-                continue;
-            }
-            builder.replace(indexS + 8, indexE + 3, Strings.EMPTY);
-        }
-        indexS=0;
-        while ((indexS = builder.indexOf("###",indexS+4)) > 0) {
-            builder.insert(indexS, "#");
-        }
+//        int index;
+//        while ((index = builder.indexOf("<a id=\"definitions\"></a>")) > 0) {
+//            builder.replace(index, index + 31, Strings.EMPTY);
+//        }
+//        int indexS;
+//
+//        while ((indexS = builder.indexOf("**样例** : `[")) > 0) {
+//            int indexE = builder.indexOf(" ]`|", indexS);
+//
+//            if (indexE < 0) {
+//                continue;
+//            }
+//            builder.replace(indexS + 8, indexE + 3, Strings.EMPTY);
+//        }
+//        while ((indexS = builder.indexOf("**样例** : `\"[")) > 0) {
+//            int indexE = builder.indexOf(")\"`|", indexS);
+//            if (indexE < 0) {
+//                continue;
+//            }
+//            builder.replace(indexS + 8, indexE + 3, Strings.EMPTY);
+//        }
+//        indexS=0;
+//        while ((indexS = builder.indexOf("###",indexS+4)) > 0) {
+//            builder.insert(indexS, "#");
+//        }
 
 
         return builder.toString();
@@ -299,14 +289,13 @@ public class SwaggerUtils {
         paths.put(k, swaggerPath);
         swagger.setPaths(paths);
 
-        Swagger2MarkupConverter swagger2MarkupConverter = XforcceSwagger2MarkupConverter.from(swagger).withConfig(config).build();
-        Swagger2MarkupConverter.Context context = swagger2MarkupConverter.getContext();
-        XforcceSwagger2MarkupConverter xforcceSwagger2MarkupConverter = new XforcceSwagger2MarkupConverter(context, definitions);
 
 
-        String s1 = xforcceSwagger2MarkupConverter.toString();
-//        System.out.println(s1);
+
+        Swagger2MarkupConverter build = Swagger2MarkupConverter.from(swagger).withConfig(config).build();
+        String s1 = build.toString();
         builder.append(s1);
+
 
         String s = SwaggerUtils.doPathWithParameter(swagger, swaggerPath);
 //        System.out.println(s);
@@ -314,19 +303,7 @@ public class SwaggerUtils {
         return builder.toString();
     }
 
-    private static String overviewDocumentGenerateMd(Swagger swagger) {
-        Swagger2MarkupConverter swagger2MarkupConverter = XforcceSwagger2MarkupConverter.from(swagger).withConfig(config).build();
-        Swagger2MarkupConverter.Context context = swagger2MarkupConverter.getContext();
-        XforcceSwagger2MarkupConverter xforcceSwagger2MarkupConverter = new XforcceSwagger2MarkupConverter(context);
-        return xforcceSwagger2MarkupConverter.overviewDocumenttoString();
-    }
 
-    private static String securityDocumentGenerateMd(Swagger swagger) {
-        Swagger2MarkupConverter swagger2MarkupConverter = XforcceSwagger2MarkupConverter.from(swagger).withConfig(config).build();
-        Swagger2MarkupConverter.Context context = swagger2MarkupConverter.getContext();
-        XforcceSwagger2MarkupConverter xforcceSwagger2MarkupConverter = new XforcceSwagger2MarkupConverter(context);
-        return xforcceSwagger2MarkupConverter.securityDocumenttoString();
-    }
 
     private static String definitionsDocumentGenerateMd(Swagger swagger, String modelKey, Model model) {
         Map<String, Model> definitions = new HashMap<>();
@@ -446,6 +423,55 @@ public class SwaggerUtils {
     }
 
 
+    private static HashMap<String, Object> getExampleHashMap(Model model,Map<String, Model> definitions) {
+        Map<String, Property> properties = model.getProperties();
+        HashMap<String, Object> resultExample = new HashMap<>(16);
+        for (String key : properties.keySet()) {
+
+            Property property = properties.get(key);
+            String type = property.getType();
+            if (property instanceof DateTimeProperty) {
+                resultExample.put(key,"yyyy-MM-dd HH:mm:ss");
+            }else if (property instanceof DateProperty) {
+                resultExample.put(key,"yyyy-MM-dd");
+            }else if (property instanceof BooleanProperty) {
+                resultExample.put(key,true);
+            }else if (property instanceof ArrayProperty) {
+                Property items = ((ArrayProperty) property).getItems();
+                if (items instanceof RefProperty) {
+                    String simpleRef = ((RefProperty) items).getSimpleRef();
+                    Model model1 = definitions.get(simpleRef);
+                    ArrayList<Object> objectArrayList = new ArrayList<>();
+                    objectArrayList.add(getExampleHashMap(model1,definitions));
+                    resultExample.put(key,objectArrayList);
+                }else {
+                    ArrayList<Object> objectArrayList = new ArrayList<>();
+                    objectArrayList.add(items.getType());
+                    resultExample.put(key,objectArrayList);
+                }
+            }else if (property instanceof MapProperty) {
+                Map map = new HashMap(2);
+                map.put("key1","value1");
+                map.put("key2","value2");
+                resultExample.put(key,map);
+            }else if (property instanceof RefProperty) {
+                String simpleRef = ((RefProperty) property).getSimpleRef();
+                Model model1 = definitions.get(simpleRef);
+                resultExample.put(key,getExampleHashMap(model1,definitions));
+            }else if (property instanceof BaseIntegerProperty) {
+                resultExample.put(key,0);
+            }else if (property instanceof DecimalProperty) {
+                resultExample.put(key,0.00);
+            }else  {
+                resultExample.put(key, type);
+            }
+
+
+
+        }
+        return resultExample;
+    }
+
     /**
      * 更新文档到ShowDoc
      *
@@ -455,6 +481,54 @@ public class SwaggerUtils {
      * @param swagger
      */
     public static void updateToShowDoc(String showDocUrl, String apiKey, String apiToken, Swagger swagger, String moduleName) {
+        Map<String, Path> paths1 = swagger.getPaths();
+        for (String url : paths1.keySet()) {
+            Path path = paths1.get(url);
+            Operation post = path.getPost();
+            List<Parameter> parameters = null;
+            if (post != null) {
+                parameters = post.getParameters();
+            }
+
+            BodyParameter bodyParameter = null;
+            if (parameters != null) {
+                for (Parameter parameter : parameters) {
+                    if (parameter instanceof BodyParameter) {
+                        bodyParameter = (BodyParameter) parameter;
+                    }
+                }
+            }
+
+            if (bodyParameter != null) {
+                if (bodyParameter.getExamples() != null) {
+                    System.out.println(bodyParameter.getExamples());
+                }
+//
+//                RefModel schema = (RefModel) bodyParameter.getSchema();
+//                String s = schema.getSimpleRef();
+//                Model model = definitions.get(s);
+//                HashMap<String, Object> resultExample = getExampleHashMap(model,definitions);
+//
+//
+//                String s1 = JSON.toJSONString(resultExample, SerializerFeature.PrettyFormat);
+
+
+            }
+
+
+
+//
+//            Response response = post.getResponses().get("200");
+//            RefModel schema =(RefModel) response.getResponseSchema();
+//
+//            String s = schema.getSimpleRef();
+//            Model model = definitions.get(s);
+//            HashMap<String, Object> resultExample = getExampleHashMap(model,definitions);
+//
+//
+//            String s1 = JSON.toJSONString(resultExample, SerializerFeature.PrettyFormat);
+        }
+
         SwaggerUtils.moduleName = moduleName;
         if (StringUtils.isEmpty(showDocUrl)) {
             throw new RuntimeException("showDoc地址不能为空");

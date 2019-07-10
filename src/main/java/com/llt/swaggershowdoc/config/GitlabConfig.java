@@ -1,4 +1,4 @@
-package com.lerry.swaggershowdoc.config;
+package com.llt.swaggershowdoc.config;
 
 import org.gitlab4j.api.GitLabApi;
 import org.springframework.context.annotation.Bean;

@@ -1,4 +1,4 @@
-package com.lerry.swaggershowdoc.util;
+package com.llt.swaggershowdoc.util;
 
 import org.apache.commons.codec.binary.Base64;
 import org.gitlab4j.api.GitLabApi;

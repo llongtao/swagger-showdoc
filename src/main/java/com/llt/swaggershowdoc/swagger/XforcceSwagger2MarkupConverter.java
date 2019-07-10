@@ -1,8 +1,9 @@
-package com.lerry.swaggershowdoc.swagger;
+package com.llt.swaggershowdoc.swagger;
 
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+
 import io.github.swagger2markup.Swagger2MarkupConverter;
 import io.github.swagger2markup.internal.document.DefinitionsDocument;
 import io.github.swagger2markup.internal.document.OverviewDocument;
@@ -47,8 +48,6 @@ public class XforcceSwagger2MarkupConverter extends Swagger2MarkupConverter {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        ;
-
 
         sb.append(applyPathsDocument().toString());
         int i = sb.indexOf("#### 消耗");
@@ -76,17 +75,20 @@ public class XforcceSwagger2MarkupConverter extends Swagger2MarkupConverter {
 
             Operation post = context.getSwagger().getPaths().get(url).getPost();
             List<Parameter> parameters = null;
-            if (post == null) {
+            if (post != null) {
                 parameters = post.getParameters();
             }
 
             BodyParameter bodyParameter = null;
-            for (Parameter parameter : parameters) {
-                if (parameter instanceof BodyParameter) {
-                    bodyParameter = (BodyParameter) parameter;
-                }
+            if (parameters != null) {
+                for (Parameter parameter : parameters) {
+                    if (parameter instanceof BodyParameter) {
+                        bodyParameter = (BodyParameter) parameter;
+                    }
 
+                }
             }
+
             if (bodyParameter != null) {
 
 
@@ -97,7 +99,10 @@ public class XforcceSwagger2MarkupConverter extends Swagger2MarkupConverter {
 
 
                 String s1 = JSON.toJSONString(resultExample, SerializerFeature.PrettyFormat);
-                sb.insert(i7 - 1, "##### 请求 body\n```json\n" + s1 + "```");
+                if (i7>0) {
+                    sb.insert(i7 - 1, "##### 请求 body\n```json\n" + s1 + "```");
+                }
+
             }
 
         }else {
