@@ -1,13 +1,12 @@
 package com.llt.swaggershowdoc.web;
 
-import com.llt.swaggershowdoc.models.Swagger2;
+import com.llt.swaggershowdoc.models.ConfigInfo;
+import com.llt.swaggershowdoc.models.ShowDocConfig;
+import com.llt.swaggershowdoc.service.Swagger2ShowDocService;
 import com.llt.swaggershowdoc.util.GitUtils;
-import com.llt.swaggershowdoc.util.OkHttpUtil;
-import com.llt.swaggershowdoc.util.SwaggerUtils;
 import io.swagger.models.Swagger;
 import io.swagger.parser.Swagger20Parser;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,23 +16,15 @@ import org.springframework.web.servlet.HandlerMapping;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @Slf4j
 @Controller
-public class ApidocController {
-
-    @Value("${showDocUrl}")
-    private String showDocUrl;
-
-    @Value("${apiKey}")
-    private String apiKey;
-
-    @Value("${apiToken}")
-    private String apiToken;
+public class ApiDocController {
 
     @Resource
-    OkHttpUtil okHttpUtil;
+    Swagger2ShowDocService swagger2ShowDocService;
 
     @RequestMapping("/")
     public String index() {
@@ -45,24 +36,26 @@ public class ApidocController {
      *
      * @return
      */
-    @PostMapping("/updateShowDoc/{moduleName}/{swaggerUrl}")
-    public ResponseEntity<String> updateShowDoc(@PathVariable("moduleName") String moduleName,
-                                                @PathVariable("swaggerUrl") String swaggerUrl
-    ) {
-        try {
-            synchronized (this) {
-                String swaggerDoc;
-                swaggerDoc = okHttpUtil.get("http://" + swaggerUrl + "/v2/api-docs", null);
+    @PostMapping("/updateShowDoc")
+    @ResponseBody
+    public String updateShowDoc(@RequestBody ConfigInfo configInfo) throws IOException {
+        swagger2ShowDocService.start(configInfo);
+        return "success";
+    }
 
-//ExamplesUtil.generateRequestExampleMap()
-                Swagger swagger = new Swagger20Parser().parse(swaggerDoc);
-                SwaggerUtils.updateToShowDoc(showDocUrl, apiKey, apiToken, new Swagger2(swagger), moduleName);
-            }
-            return ResponseEntity.ok("同步成功!");
-        } catch (IOException e) {
-            log.info(e.getMessage());
-        }
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("同步失败");
+
+
+    @PostMapping("/saveConfig")
+    @ResponseBody
+    public String saveConfig(@RequestBody ConfigInfo configInfo, HttpSession session) {
+        session.setAttribute("configInfo",configInfo);
+        return "success";
+    }
+
+    @GetMapping("/getConfig")
+    @ResponseBody
+    public ConfigInfo getConfig( HttpSession session) {
+        return (ConfigInfo)session.getAttribute("configInfo");
     }
 
 
@@ -92,7 +85,7 @@ public class ApidocController {
             String file = GitUtils.downLoadFile(filePath, projectName, ref);
 
             Swagger swagger = new Swagger20Parser().parse(file);
-            SwaggerUtils.updateToShowDoc(showDocUrl, apiKey, apiToken, swagger, swaggerUiUrl);
+            swagger2ShowDocService.updateToShowDoc(new ShowDocConfig(showDocUrl,apiKey,apiToken), swagger, swaggerUiUrl);
             return ResponseEntity.ok("gitWebHook触发更新文档成功");
         } catch (Exception e) {
             log.info(e.getMessage());
