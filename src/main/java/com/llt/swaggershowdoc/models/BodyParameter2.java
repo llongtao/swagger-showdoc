@@ -31,6 +31,22 @@ public class BodyParameter2 extends BodyParameter {
     }
 
     public BodyParameter2(BodyParameter bodyParameter, Map<String, Model> definitions) {
+        setSchema(bodyParameter.getSchema());
+        setIn(bodyParameter.getIn());
+        setName(bodyParameter.getName());
+        setDescription(bodyParameter.getDescription());
+        setRequired(bodyParameter.getRequired());
+        setAccess(bodyParameter.getAccess());
+        setPattern(bodyParameter.getPattern());
+        setVendorExtensions(bodyParameter.getVendorExtensions());
+        setIn(bodyParameter.getIn());
+        setAccess(bodyParameter.getAccess());
+        setName(bodyParameter.getName());
+        setDescription(bodyParameter.getDescription());
+        setRequired(bodyParameter.getRequired());
+        setPattern(bodyParameter.getPattern());
+
+
         Model schema = bodyParameter.getSchema();
         if (schema instanceof RefModel) {
             Model model = definitions.get(((RefModel) schema).getSimpleRef());

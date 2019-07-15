@@ -17,14 +17,21 @@ import io.swagger.models.properties.Property;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.parser.Swagger20Parser;
 import io.swagger.util.Json;
+import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Ref;
 import java.util.*;
 
 import static com.llt.swaggershowdoc.markdownbulider.constants.FontStyle.BOLD;
@@ -64,11 +71,24 @@ public class Swagger2ShowDocService {
     @Resource
     private RestTemplate restTemplate;
 
+
     public void start(ConfigInfo configInfo) throws IOException {
+
+
         List<SwaggerConfig> swaggerConfigList = configInfo.getSwaggerConfigList();
         ShowDocConfig showDocConfig = configInfo.getShowDocConfig();
         for (SwaggerConfig swaggerConfig : swaggerConfigList) {
-            URL url = new URL("http", swaggerConfig.getIp(), swaggerConfig.getPort(), "/" + swaggerConfig.getPath() + "/v2/api-docs");
+            Integer port = swaggerConfig.getPort();
+            if (port == null) {
+                port = 80;
+            }
+            String path = swaggerConfig.getPath();
+            if (StringUtils.isEmpty(path)) {
+                path = Strings.EMPTY;
+            } else {
+                path = "/" + path;
+            }
+            URL url = new URL("http", swaggerConfig.getIp(), port, path + "/v2/api-docs");
             String swaggerStr = restTemplate.getForObject(url.toString(), String.class);
             assert swaggerStr != null;
             Swagger swagger = new Swagger20Parser().parse(swaggerStr);
@@ -85,6 +105,7 @@ public class Swagger2ShowDocService {
      * @param swagger
      */
     public void updateToShowDoc(ShowDocConfig showDocConfig, Swagger swagger, String moduleName) {
+
         String showDocUrl = showDocConfig.getUrl();
         /**
          * showDoc更新文档api地址
@@ -92,13 +113,11 @@ public class Swagger2ShowDocService {
          * http://你的域名/server/index.php?s=/api/item/updateByApi
          */
         if (!showDocUrl.contains("www.showdoc.cc")) {
-            showDocUrl = showDocUrl + "/server/index.php?s=/api/item/updateByApi";
+            showDocUrl = "http://" + showDocUrl + "/server/index.php?s=/api/item/updateByApi";
         } else {
             showDocUrl = "https://www.showdoc.cc/server/api/item/updateByApi";
         }
         showDocConfig.setUrl(showDocUrl);
-
-        Map<String, List<Path>> showDocMap = new HashMap<>();
 
         List<Tag> tags = swagger.getTags();
         Map<String, Path> paths = swagger.getPaths();
@@ -109,7 +128,6 @@ public class Swagger2ShowDocService {
                 findApiByTag(v, tag, showDocPath);
                 doShowDoc(showDocConfig, moduleName, v, tag, swagger, k);
             });
-            showDocMap.put(tag.getName(), showDocPath);
         });
 
     }
@@ -129,7 +147,7 @@ public class Swagger2ShowDocService {
             List<String> tagList = operation.getTags();
 
             tagList.forEach(tags -> {
-                if (StringUtils.equals(tag.getName(), tags)) {
+                if (Objects.equals(tag.getName(), tags)) {
                     showDocPath.add(path);
                 }
             });
@@ -137,6 +155,7 @@ public class Swagger2ShowDocService {
     }
 
     private void doShowDoc(ShowDocConfig showDocConfig, String moduleName, Path path, Tag tag, Swagger swagger, String apiPath) {
+
         if (null != path.getPost() && path.getPost().getTags().contains(tag.getName())
                 || null != path.getGet() && path.getGet().getTags().contains(tag.getName())
                 || null != path.getPut() && path.getPut().getTags().contains(tag.getName())
@@ -160,18 +179,25 @@ public class Swagger2ShowDocService {
      * @param sNumber       页面序号。数字越小，该页面越靠前（可空）
      */
     private void sendToShowDoc(ShowDocConfig showDocConfig, String catName, String catNameSub, String pageTitle, String pageContent, String sNumber) {
-        Map<String, String> parMap = new HashMap<>();
-        parMap.put("api_key", showDocConfig.getApiKey());
-        parMap.put("api_token", showDocConfig.getApiToken());
-        parMap.put("cat_name", catName);
-        parMap.put("cat_name_sub", catNameSub);
-        parMap.put("page_title", pageTitle);
-        parMap.put("page_content", pageContent);
-        parMap.put("s_number", sNumber);
-        System.out.println(pageContent);
-        System.out.println("-------------------------");
-        restTemplate.postForObject(showDocConfig.getUrl(), parMap, String.class);
-//        okHttpUtil.post(showDocApiUrl, parMap);
+        MultiValueMap<String, String> parMap = new LinkedMultiValueMap<String, String>();
+        parMap.add("api_key", showDocConfig.getApiKey());
+        parMap.add("api_token", showDocConfig.getApiToken());
+        parMap.add("cat_name", catName);
+        parMap.add("cat_name_sub", catNameSub);
+        parMap.add("page_title", pageTitle);
+        parMap.add("page_content", pageContent);
+        parMap.add("s_number", sNumber);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        String response = restTemplate.postForObject(showDocConfig.getUrl(), new HttpEntity<>(parMap, headers), String.class);
+        ShowDocResponse showDocResponse = JSON.parseObject(response, ShowDocResponse.class);
+        if (showDocResponse == null) {
+            throw new IllegalArgumentException("showdoc 接口请求失败");
+        }
+        if (!"0".equals(showDocResponse.getError_code())) {
+            throw new IllegalArgumentException(showDocResponse.getError_message());
+        }
     }
 
     private String getApiDescription(Path path) {
@@ -276,13 +302,35 @@ public class Swagger2ShowDocService {
                     .writeTable(tableParameterList, TITLE_MAP).newLine();
         }
 
-
+        List<RefModel> refModelList = new ArrayList<>();
         if (bodyParameter != null) {
             Map<String, String> examples = bodyParameter.getExamples();
             Model schema = bodyParameter.getSchema();
             if (schema instanceof RefModel) {
-                String title = definitions.get(((RefModel) schema).getSimpleRef()).getTitle();
+                String simpleRef = ((RefModel) schema).getSimpleRef();
+                String title = definitions.get(simpleRef).getTitle();
+                if (title == null) {
+                    title = simpleRef;
+                }
                 markdownBuilder.write("请求实体：", BOLD).crossReferenceRaw(null, title, title).newLine();
+                refModelList.add((RefModel) schema);
+            }else if (schema instanceof ArrayModel) {
+                Property items = ((ArrayModel) schema).getItems();
+                if (items instanceof ArrayProperty) {
+                    items = getArrayRefProperty((ArrayProperty) items);
+                }
+                if (items instanceof RefProperty) {
+                    String simpleRef = ((RefProperty) items).getSimpleRef();
+                    Model model = definitions.get(simpleRef);
+                    if (model instanceof RefModel) {
+                        String title = model.getTitle();
+                        if (title == null) {
+                            title = simpleRef;
+                        }
+                        markdownBuilder.write("请求实体：", BOLD).crossReferenceRaw(null, title, title).newLine();
+                        refModelList.add((RefModel) model);
+                    }
+                }
             }
             if (examples != null) {
                 markdownBuilder.writeln("请求body：", BOLD)
@@ -294,34 +342,61 @@ public class Swagger2ShowDocService {
         Map<String, Object> examples = response.getExamples();
         Model responseSchema1 = response.getResponseSchema();
         if (responseSchema1 instanceof RefModel) {
-            String title = definitions.get(((RefModel) responseSchema1).getSimpleRef()).getTitle();
+            String simpleRef = ((RefModel) responseSchema1).getSimpleRef();
+            String title = definitions.get(simpleRef).getTitle();
+            if (title == null) {
+                title = simpleRef;
+            }
             markdownBuilder.write("响应实体：", BOLD).crossReferenceRaw(null, title, title).newLine();
+            refModelList.add((RefModel) responseSchema1);
+        }else if (responseSchema1 instanceof ArrayModel) {
+            Property items = ((ArrayModel) responseSchema1).getItems();
+            if (items instanceof ArrayProperty) {
+                items = getArrayRefProperty((ArrayProperty) items);
+            }
+            if (items instanceof RefProperty) {
+                String simpleRef = ((RefProperty) items).getSimpleRef();
+                Model model = definitions.get(simpleRef);
+                if (model instanceof RefModel) {
+                    String title = model.getTitle();
+                    if (title == null) {
+                        title = simpleRef;
+                    }
+                    markdownBuilder.write("响应实体：", BOLD).crossReferenceRaw(null, title, title).newLine();
+                    refModelList.add((RefModel) model);
+                }
+            }
         }
+
+
+
         if (examples != null) {
             markdownBuilder.writeln("响应示例", BOLD)
                     .writeHighlight(Json.pretty(examples), "json").newLine();
 
         }
-        markdownBuilder.writeTitle("数据模型", MdLevel.ONE);
+        markdownBuilder.writeTitle("数据模型", MdLevel.THREE);
         markdownBuilder.newLine();
-        Model responseSchema = response.getResponseSchema();
-        List<PropertyModel> propertyList = new ArrayList<>();
-        if (responseSchema instanceof RefModel) {
-            RefModel refModel = (RefModel) responseSchema;
-            String simpleRef = refModel.getSimpleRef();
 
+
+        refModelList.forEach(refModel -> {
+            List<PropertyModel> propertyList = new ArrayList<>();
+            String simpleRef = refModel.getSimpleRef();
             Model model = definitions.get(simpleRef);
             Map<String, Property> properties = model.getProperties();
             List<RefProperty> refPropertyList = new ArrayList<>();
             buildPropertyList(propertyList, properties, refPropertyList);
             String name = model.getTitle();
+            if (name == null) {
+                name = simpleRef;
+            }
             markdownBuilder.writeAnchor(name);
             markdownBuilder.writeln(name, BOLD);
             markdownBuilder.writeTable(propertyList, TITLE_MAP);
             Set<String> set = new HashSet<>();
             set.add(name);
             buildRefModelTable(refPropertyList, definitions, markdownBuilder, set);
-        }
+        });
 
         return markdownBuilder.toString();
     }
@@ -373,8 +448,12 @@ public class Swagger2ShowDocService {
         List<RefProperty> propertyRefList = new ArrayList<>();
 
         for (RefProperty refProperty : refList) {
-            Model model = definitions.get(refProperty.getSimpleRef());
+            String simpleRef = refProperty.getSimpleRef();
+            Model model = definitions.get(simpleRef);
             String name = model.getTitle();
+            if (name == null) {
+                name = simpleRef;
+            }
             if (modelNameSet.contains(name)) {
                 continue;
             }
@@ -400,6 +479,8 @@ public class Swagger2ShowDocService {
         }
         return items;
     }
+
+
 
 
 }
