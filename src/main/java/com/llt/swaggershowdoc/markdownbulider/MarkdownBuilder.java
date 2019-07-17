@@ -213,24 +213,25 @@ public class MarkdownBuilder {
     }
 
     public MarkdownBuilder crossReferenceRaw(String document, String anchor, String text) {
-        if (text == null)
-            text = anchor.trim();
-        stringBuilder.append("[").append(text).append("]").append("(");
-        if (document != null)
-            stringBuilder.append(document);
-        stringBuilder.append("#").append(anchor).append(")");
+        getRef(document, anchor, text, stringBuilder);
         return this;
     }
 
     public static String getReference(String document, String anchor, String text) {
         StringBuilder stringBuilder = new StringBuilder();
-        if (text == null)
-            text = anchor.trim();
-        stringBuilder.append("[").append(text).append("]").append("(");
-        if (document != null)
-            stringBuilder.append(document);
-        stringBuilder.append("#").append(anchor).append(")");
+        getRef(document, anchor, text, stringBuilder);
         return stringBuilder.toString();
+    }
+
+    private static void getRef(String document, String anchor, String text, StringBuilder stringBuilder) {
+        if (text == null) {
+            text = anchor.trim();
+        }
+        stringBuilder.append("[").append(text).append("]").append("(");
+        if (document != null) {
+            stringBuilder.append(document);
+        }
+        stringBuilder.append("#").append(anchor).append(")");
     }
 
 

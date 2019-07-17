@@ -41,21 +41,6 @@ import static com.llt.swaggershowdoc.markdownbulider.constants.FontStyle.HIGHLIG
 @Service
 public class Swagger2ShowDocService {
 
-    private static Swagger2MarkupConfig config;
-
-    private static Map<String, Model> definitions = new HashMap<>();
-
-    static {
-        config = new Swagger2MarkupConfigBuilder()
-                .withMarkupLanguage(MarkupLanguage.MARKDOWN)
-                .withOutputLanguage(Language.ZH)
-                .withFlatBody()
-                .withoutInlineSchema()
-                .withoutPathSecuritySection()
-                .withGeneratedExamples()
-                .build();
-    }
-
     private static LinkedHashMap<String, String> TITLE_MAP;
 
     static {
@@ -73,10 +58,18 @@ public class Swagger2ShowDocService {
 
 
     public void start(ConfigInfo configInfo) throws IOException {
+        ShowDocConfig showDocConfig = configInfo.getShowDocConfig();
+        String showDocUrl = showDocConfig.getUrl();
 
+        //组装showDoc 请求地址
+        if (!showDocUrl.contains("www.showdoc.cc")) {
+            showDocUrl = "http://" + showDocUrl + "/server/index.php?s=/api/item/updateByApi";
+        } else {
+            showDocUrl = "https://www.showdoc.cc/server/api/item/updateByApi";
+        }
+        showDocConfig.setUrl(showDocUrl);
 
         List<SwaggerConfig> swaggerConfigList = configInfo.getSwaggerConfigList();
-        ShowDocConfig showDocConfig = configInfo.getShowDocConfig();
         for (SwaggerConfig swaggerConfig : swaggerConfigList) {
             Integer port = swaggerConfig.getPort();
             if (port == null) {
@@ -92,7 +85,6 @@ public class Swagger2ShowDocService {
             String swaggerStr = restTemplate.getForObject(url.toString(), String.class);
             assert swaggerStr != null;
             Swagger swagger = new Swagger20Parser().parse(swaggerStr);
-            definitions = swagger.getDefinitions();
             updateToShowDoc(showDocConfig, new Swagger2(swagger), swaggerConfig.getModule());
         }
 
@@ -105,19 +97,6 @@ public class Swagger2ShowDocService {
      * @param swagger
      */
     public void updateToShowDoc(ShowDocConfig showDocConfig, Swagger swagger, String moduleName) {
-
-        String showDocUrl = showDocConfig.getUrl();
-        /**
-         * showDoc更新文档api地址
-         * 如果你使用开源版的showdoc ,则请求url为
-         * http://你的域名/server/index.php?s=/api/item/updateByApi
-         */
-        if (!showDocUrl.contains("www.showdoc.cc")) {
-            showDocUrl = "http://" + showDocUrl + "/server/index.php?s=/api/item/updateByApi";
-        } else {
-            showDocUrl = "https://www.showdoc.cc/server/api/item/updateByApi";
-        }
-        showDocConfig.setUrl(showDocUrl);
 
         List<Tag> tags = swagger.getTags();
         Map<String, Path> paths = swagger.getPaths();
@@ -155,14 +134,14 @@ public class Swagger2ShowDocService {
     }
 
     private void doShowDoc(ShowDocConfig showDocConfig, String moduleName, Path path, Tag tag, Swagger swagger, String apiPath) {
-
-        if (null != path.getPost() && path.getPost().getTags().contains(tag.getName())
+       boolean contains = null != path.getPost() && path.getPost().getTags().contains(tag.getName())
                 || null != path.getGet() && path.getGet().getTags().contains(tag.getName())
                 || null != path.getPut() && path.getPut().getTags().contains(tag.getName())
                 || null != path.getOptions() && path.getOptions().getTags().contains(tag.getName())
                 || null != path.getDelete() && path.getDelete().getTags().contains(tag.getName())
                 || null != path.getPatch() && path.getPatch().getTags().contains(tag.getName())
-                || null != path.getHead() && path.getHead().getTags().contains(tag.getName())) {
+                || null != path.getHead() && path.getHead().getTags().contains(tag.getName());
+        if (contains) {
             sendToShowDoc(showDocConfig, moduleName, tag.getName(), getApiDescription(path), generateMd(swagger, apiPath, path), "");
         }
     }

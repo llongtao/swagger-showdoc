@@ -1,6 +1,9 @@
 package com.llt.swaggershowdoc.markdownbulider.constants;
 
 public enum  MdLevel {
+    /**
+     *
+     */
     ONE(1),
 
     TWO(2),
