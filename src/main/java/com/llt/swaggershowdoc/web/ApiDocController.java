@@ -40,7 +40,6 @@ public class ApiDocController {
     @ResponseBody
     public String saveConfig(@RequestBody ConfigInfo configInfo, HttpSession session) {
         session.setAttribute("configInfo",configInfo);
-        session.setMaxInactiveInterval(-1);
         return "success";
     }
 
