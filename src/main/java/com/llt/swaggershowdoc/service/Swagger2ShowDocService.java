@@ -1,6 +1,7 @@
 package com.llt.swaggershowdoc.service;
 
 import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.llt.swaggershowdoc.markdownbulider.MarkdownBuilder;
 import com.llt.swaggershowdoc.markdownbulider.constants.MdLevel;
 import com.llt.swaggershowdoc.models.*;
@@ -384,19 +385,21 @@ public class Swagger2ShowDocService {
         properties.forEach((name, property) -> {
             if (property instanceof RefProperty) {
                 refPropertyList.add((RefProperty) property);
-                propertyList.add(new PropertyModel(name, property.getRequired(), MarkdownBuilder.getReference(null, ((RefProperty) property).getSimpleRef(), null), property.getDescription(), JSON.toJSONString(property.getExample())));
+                propertyList.add(new PropertyModel(name, property.getRequired(), MarkdownBuilder.getReference(null, ((RefProperty) property).getSimpleRef(), null), property.getDescription(), property.getExample()));
             } else if (property instanceof ArrayProperty) {
                 Property arrayRefProperty = getArrayRefProperty((ArrayProperty) property);
                 if (arrayRefProperty instanceof RefProperty) {
                     refPropertyList.add((RefProperty) arrayRefProperty);
                 }
-                propertyList.add(new PropertyModel(name, property.getRequired(), getArrayPropertyType((ArrayProperty) property), property.getDescription(), JSON.toJSONString(property.getExample())));
+                propertyList.add(new PropertyModel(name, property.getRequired(), getArrayPropertyType((ArrayProperty) property), property.getDescription(), property.getExample()));
             } else {
-                propertyList.add(new PropertyModel(name, property.getRequired(), property.getType(), property.getDescription(), JSON.toJSONString(property.getExample())));
+                propertyList.add(new PropertyModel(name, property.getRequired(), property.getType(), property.getDescription(), property.getExample()));
             }
 
         });
     }
+
+
 
     private String getArrayPropertyType(ArrayProperty arrayProperty) {
         String name;
