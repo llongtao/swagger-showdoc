@@ -288,11 +288,7 @@ public class Swagger2ShowDocService {
             Model schema = bodyParameter.getSchema();
             if (schema instanceof RefModel) {
                 String simpleRef = ((RefModel) schema).getSimpleRef();
-                String title = definitions.get(simpleRef).getTitle();
-                if (title == null) {
-                    title = simpleRef;
-                }
-                markdownBuilder.write("请求实体：", BOLD).crossReferenceRaw(null, title, title).newLine();
+                markdownBuilder.write("请求实体：", BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
                 refModelList.add((RefModel) schema);
             }else if (schema instanceof ArrayModel) {
                 Property items = ((ArrayModel) schema).getItems();
@@ -303,11 +299,7 @@ public class Swagger2ShowDocService {
                     String simpleRef = ((RefProperty) items).getSimpleRef();
                     Model model = definitions.get(simpleRef);
                     if (model instanceof RefModel) {
-                        String title = model.getTitle();
-                        if (title == null) {
-                            title = simpleRef;
-                        }
-                        markdownBuilder.write("请求实体：", BOLD).crossReferenceRaw(null, title, title).newLine();
+                        markdownBuilder.write("请求实体：", BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
                         refModelList.add((RefModel) model);
                     }
                 }
@@ -323,11 +315,7 @@ public class Swagger2ShowDocService {
         Model responseSchema1 = response.getResponseSchema();
         if (responseSchema1 instanceof RefModel) {
             String simpleRef = ((RefModel) responseSchema1).getSimpleRef();
-            String title = definitions.get(simpleRef).getTitle();
-            if (title == null) {
-                title = simpleRef;
-            }
-            markdownBuilder.write("响应实体：", BOLD).crossReferenceRaw(null, title, title).newLine();
+            markdownBuilder.write("响应实体：", BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
             refModelList.add((RefModel) responseSchema1);
         }else if (responseSchema1 instanceof ArrayModel) {
             Property items = ((ArrayModel) responseSchema1).getItems();
@@ -338,11 +326,7 @@ public class Swagger2ShowDocService {
                 String simpleRef = ((RefProperty) items).getSimpleRef();
                 Model model = definitions.get(simpleRef);
                 if (model instanceof RefModel) {
-                    String title = model.getTitle();
-                    if (title == null) {
-                        title = simpleRef;
-                    }
-                    markdownBuilder.write("响应实体：", BOLD).crossReferenceRaw(null, title, title).newLine();
+                    markdownBuilder.write("响应实体：", BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
                     refModelList.add((RefModel) model);
                 }
             }
@@ -366,15 +350,12 @@ public class Swagger2ShowDocService {
             Map<String, Property> properties = model.getProperties();
             List<RefProperty> refPropertyList = new ArrayList<>();
             buildPropertyList(propertyList, properties, refPropertyList);
-            String name = model.getTitle();
-            if (name == null) {
-                name = simpleRef;
-            }
-            markdownBuilder.writeAnchor(name);
-            markdownBuilder.writeln(name, BOLD);
+
+            markdownBuilder.writeAnchor(simpleRef);
+            markdownBuilder.writeln(simpleRef, BOLD);
             markdownBuilder.writeTable(propertyList, TITLE_MAP);
             Set<String> set = new HashSet<>();
-            set.add(name);
+            set.add(simpleRef);
             buildRefModelTable(refPropertyList, definitions, markdownBuilder, set);
         });
 
@@ -432,20 +413,16 @@ public class Swagger2ShowDocService {
         for (RefProperty refProperty : refList) {
             String simpleRef = refProperty.getSimpleRef();
             Model model = definitions.get(simpleRef);
-            String name = model.getTitle();
-            if (name == null) {
-                name = simpleRef;
-            }
-            if (modelNameSet.contains(name)) {
+            if (modelNameSet.contains(simpleRef)) {
                 continue;
             }
-            modelNameSet.add(name);
+            modelNameSet.add(simpleRef);
             Map<String, Property> properties = model.getProperties();
             List<PropertyModel> propertyList = new ArrayList<>();
             buildPropertyList(propertyList, properties, propertyRefList);
 
-            markdownBuilder.writeAnchor(name);
-            markdownBuilder.writeln(name, BOLD);
+            markdownBuilder.writeAnchor(simpleRef);
+            markdownBuilder.writeln(simpleRef, BOLD);
             markdownBuilder.writeTable(propertyList, TITLE_MAP);
         }
 
