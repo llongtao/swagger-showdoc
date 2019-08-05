@@ -4,10 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Created with IntelliJ IDEA.
- * Description:
- *
- * @author LErry.li
+ * @author LILONGTAO
  * Date: 2018-07-14
  * Time: 下午11：00：00
  */

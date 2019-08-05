@@ -8,7 +8,6 @@ import java.util.*;
 /**
  * @author LILONGTAO
  * @date 2019-07-10
- * @Description
  */
 public class ExampleUtil {
     public static HashMap<String, Object> getBodyExample(Model model, Map<String, Model> definitions, Set<String> modelSet) {
