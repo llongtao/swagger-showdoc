@@ -1,7 +1,7 @@
 # swagger-showdoc
 
-[![License](http://img.shields.io/:license-apache-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![SpringBoot](https://img.shields.io/badge/SpringBoot-2.0.3.RELEASE-brightgreen.svg)](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/)
+![License](https://img.shields.io/badge/license-GPL-blue)
+![SpringBoot](https://img.shields.io/badge/SpringBoot-2.0.3.RELEASE-brightgreen.svg)](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/)
 
 #### 项目介绍
 公司统一使用ShowDoc记录接口文档,swagger形同虚设,为了避免重复劳动,打算寻找一个工具能把swagger转化为ShowDoc,
