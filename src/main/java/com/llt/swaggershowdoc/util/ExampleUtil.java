@@ -14,6 +14,9 @@ public class ExampleUtil {
         if (modelSet == null) {
             modelSet = new HashSet<>();
         }
+        if (model == null) {
+            return new HashMap<>();
+        }
         Map<String, Property> properties = model.getProperties();
         HashMap<String, Object> resultExample = new HashMap<>(16);
         Set<String> tmpModelSet = new HashSet<>();
@@ -28,11 +31,19 @@ public class ExampleUtil {
                 property = getNoMapProperty(valueMap, (MapProperty) property);
                 type = property.getType();
             }
-
+            Object example = property.getExample();
             if (property instanceof DateTimeProperty) {
-                value = "datetime";
+                if (example == null) {
+                    value = "yyyy-MM-dd HH:mm:ss";
+                }else {
+                    value = example.toString();
+                }
             } else if (property instanceof DateProperty) {
-                value = "date";
+                if (example == null) {
+                    value = "yyyy-MM-dd";
+                }else {
+                    value = example.toString();
+                }
             } else if (property instanceof BooleanProperty) {
                 value = true;
             } else if (property instanceof ArrayProperty) {
@@ -42,11 +53,9 @@ public class ExampleUtil {
                 if (modelSet.contains(title) && !tmpModelSet.contains(title)) {
                     value = title;
                 } else {
-                    modelSet.add(title);
                     tmpModelSet.add(title);
-                    String simpleRef = ((RefProperty) property).getSimpleRef();
-                    Model model1 = definitions.get(simpleRef);
-                    value = getBodyExample(model1, definitions, modelSet);
+                    value = getRefValue(definitions, modelSet, title, example);
+
                 }
             } else if (property instanceof BaseIntegerProperty) {
                 value = 0;
@@ -91,8 +100,8 @@ public class ExampleUtil {
         Property items = arrayProperty.getItems();
         if (items instanceof RefProperty) {
             String simpleRef = ((RefProperty) items).getSimpleRef();
-            Model model = definitions.get(simpleRef);
-            objectArrayList.add(getBodyExample(model, definitions, modelSet));
+            Object example = items.getExample();
+            objectArrayList.add(getRefValue(definitions, modelSet, simpleRef, example));
         } else if (items instanceof ArrayProperty) {
             objectArrayList.add(getArrayExample((ArrayProperty) items, definitions, modelSet));
         } else {
@@ -100,4 +109,26 @@ public class ExampleUtil {
         }
         return objectArrayList;
     }
+
+    private static Object getRefValue(Map<String, Model> definitions, Set<String> modelSet, String simpleRef, Object example) {
+        Object value;
+        if ("LocalDate".equals(simpleRef)) {
+            value = "yyyy-MM-dd";
+        } else if ("LocalDateTime".equals(simpleRef)) {
+            value = "yyyy-MM-dd HH:mm:ss";
+        } else if ("LocalTime".equals(simpleRef)) {
+            value = "HH:mm:ss";
+        } else {
+            modelSet.add(simpleRef);
+            Model model1 = definitions.get(simpleRef);
+            if (model1 == null) {
+                value = example;
+            } else {
+                value = getBodyExample(model1, definitions, modelSet);
+            }
+        }
+        return value;
+    }
+
+
 }

@@ -1,14 +1,9 @@
 package com.llt.swaggershowdoc.service;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.llt.swaggershowdoc.markdownbulider.MarkdownBuilder;
 import com.llt.swaggershowdoc.markdownbulider.constants.MdLevel;
 import com.llt.swaggershowdoc.models.*;
-import io.github.swagger2markup.Language;
-import io.github.swagger2markup.Swagger2MarkupConfig;
-import io.github.swagger2markup.builder.Swagger2MarkupConfigBuilder;
-import io.github.swagger2markup.markup.builder.MarkupLanguage;
 import io.swagger.models.*;
 import io.swagger.models.parameters.AbstractSerializableParameter;
 import io.swagger.models.parameters.BodyParameter;
@@ -32,8 +27,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Ref;
 import java.util.*;
+import java.util.concurrent.*;
 
 import static com.llt.swaggershowdoc.markdownbulider.constants.FontStyle.BOLD;
 import static com.llt.swaggershowdoc.markdownbulider.constants.FontStyle.HIGHLIGHT;
@@ -83,7 +78,17 @@ public class Swagger2ShowDocService {
                 path = "/" + path;
             }
             URL url = new URL("http", swaggerConfig.getIp(), port, path + "/v2/api-docs");
-            String swaggerStr = restTemplate.getForObject(url.toString(), String.class);
+
+            Callable<String> callable = () -> restTemplate.getForObject(url.toString(), String.class);
+            ExecutorService executor = Executors.newSingleThreadExecutor();
+            Future<String> submit = executor.submit(callable);
+            String swaggerStr = null;
+            try {
+                swaggerStr = submit.get(3, TimeUnit.SECONDS);
+            } catch (Exception e) {
+                throw new RuntimeException("连接超时");
+            }
+
             assert swaggerStr != null;
             Swagger swagger = new Swagger20Parser().parse(swaggerStr);
             updateToShowDoc(showDocConfig, new Swagger2(swagger), swaggerConfig.getModule());
@@ -135,7 +140,7 @@ public class Swagger2ShowDocService {
     }
 
     private void doShowDoc(ShowDocConfig showDocConfig, String moduleName, Path path, Tag tag, Swagger swagger, String apiPath) {
-       boolean contains = null != path.getPost() && path.getPost().getTags().contains(tag.getName())
+        boolean contains = null != path.getPost() && path.getPost().getTags().contains(tag.getName())
                 || null != path.getGet() && path.getGet().getTags().contains(tag.getName())
                 || null != path.getPut() && path.getPut().getTags().contains(tag.getName())
                 || null != path.getOptions() && path.getOptions().getTags().contains(tag.getName())
@@ -290,7 +295,7 @@ public class Swagger2ShowDocService {
                 String simpleRef = ((RefModel) schema).getSimpleRef();
                 markdownBuilder.write("请求实体：", BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
                 refModelList.add((RefModel) schema);
-            }else if (schema instanceof ArrayModel) {
+            } else if (schema instanceof ArrayModel) {
                 Property items = ((ArrayModel) schema).getItems();
                 if (items instanceof ArrayProperty) {
                     items = getArrayRefProperty((ArrayProperty) items);
@@ -317,7 +322,7 @@ public class Swagger2ShowDocService {
             String simpleRef = ((RefModel) responseSchema1).getSimpleRef();
             markdownBuilder.write("响应实体：", BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
             refModelList.add((RefModel) responseSchema1);
-        }else if (responseSchema1 instanceof ArrayModel) {
+        } else if (responseSchema1 instanceof ArrayModel) {
             Property items = ((ArrayModel) responseSchema1).getItems();
             if (items instanceof ArrayProperty) {
                 items = getArrayRefProperty((ArrayProperty) items);
@@ -331,7 +336,6 @@ public class Swagger2ShowDocService {
                 }
             }
         }
-
 
 
         if (examples != null) {
@@ -381,7 +385,6 @@ public class Swagger2ShowDocService {
     }
 
 
-
     private String getArrayPropertyType(ArrayProperty arrayProperty) {
         String name;
 
@@ -413,7 +416,7 @@ public class Swagger2ShowDocService {
         for (RefProperty refProperty : refList) {
             String simpleRef = refProperty.getSimpleRef();
             Model model = definitions.get(simpleRef);
-            if (modelNameSet.contains(simpleRef)) {
+            if (modelNameSet.contains(simpleRef) || model == null) {
                 continue;
             }
             modelNameSet.add(simpleRef);
@@ -438,8 +441,6 @@ public class Swagger2ShowDocService {
         }
         return items;
     }
-
-
 
 
 }
