@@ -3,6 +3,7 @@ package com.llt.swaggershowdoc.models;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class SwaggerConfig {
@@ -13,7 +14,7 @@ public class SwaggerConfig {
     @NotEmpty(message = "swagger地址不能为空")
     private String ip;
 
-    @NotEmpty(message = "swagger端口不能为空")
+    @NotNull(message = "swagger端口不能为空")
     private Integer port;
 
     private String path;
