@@ -21,6 +21,7 @@ public class MyGlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(Exception.class)
     public BaseResponse customException(Exception e) {
+        e.printStackTrace();
         return BaseResponse.error(e.getMessage());
     }
 }

@@ -101,7 +101,12 @@ public class ExampleUtil {
         if (items instanceof RefProperty) {
             String simpleRef = ((RefProperty) items).getSimpleRef();
             Object example = items.getExample();
-            objectArrayList.add(getRefValue(definitions, modelSet, simpleRef, example));
+            if (modelSet.contains(simpleRef)) {
+                objectArrayList.add(simpleRef);
+            }else {
+                objectArrayList.add(getRefValue(definitions, modelSet, simpleRef, example));
+            }
+
         } else if (items instanceof ArrayProperty) {
             objectArrayList.add(getArrayExample((ArrayProperty) items, definitions, modelSet));
         } else {
