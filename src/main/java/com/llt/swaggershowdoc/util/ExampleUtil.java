@@ -18,8 +18,13 @@ public class ExampleUtil {
             return new HashMap<>();
         }
         Map<String, Property> properties = model.getProperties();
+        if (properties == null) {
+            return new HashMap<>();
+        }
+
         HashMap<String, Object> resultExample = new HashMap<>(16);
         Set<String> tmpModelSet = new HashSet<>();
+
         for (String key : properties.keySet()) {
             Property property = properties.get(key);
             String type = property.getType();

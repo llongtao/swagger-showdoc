@@ -35,6 +35,7 @@ public class ApiDocController {
         try{
             swagger2ShowDocService.start(configInfo);
         }catch (Exception e){
+            e.printStackTrace();
             return BaseResponse.error(e.getMessage());
         }
 

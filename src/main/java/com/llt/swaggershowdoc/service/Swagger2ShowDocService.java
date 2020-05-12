@@ -367,6 +367,9 @@ public class Swagger2ShowDocService {
     }
 
     private void buildPropertyList(List<PropertyModel> propertyList, Map<String, Property> properties, List<RefProperty> refPropertyList) {
+        if (properties == null) {
+            return;
+        }
         properties.forEach((name, property) -> {
             if (property instanceof RefProperty) {
                 refPropertyList.add((RefProperty) property);
