@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -27,6 +28,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -78,7 +80,7 @@ public class Swagger2ShowDocService {
                 path = "/" + path;
             }
             URL url = new URL("http", swaggerConfig.getIp(), port, path + "/v2/api-docs");
-
+            restTemplate.getMessageConverters().set(1,new StringHttpMessageConverter(StandardCharsets.UTF_8));
             Callable<String> callable = () -> restTemplate.getForObject(url.toString(), String.class);
             ExecutorService executor = Executors.newSingleThreadExecutor();
             Future<String> submit = executor.submit(callable);
@@ -175,6 +177,7 @@ public class Swagger2ShowDocService {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        restTemplate.getMessageConverters().set(1,new StringHttpMessageConverter(StandardCharsets.UTF_8));
         String response = restTemplate.postForObject(showDocConfig.getUrl(), new HttpEntity<>(parMap, headers), String.class);
         ShowDocResponse showDocResponse = JSON.parseObject(response, ShowDocResponse.class);
         if (showDocResponse == null) {
