@@ -30,7 +30,7 @@ public class ApiDocController {
      *
      */
     @ResponseBody
-    @PostMapping("/updateShowDoc")
+    @PostMapping(value = "/updateShowDoc",produces="application/json;charset=UTF-8",consumes="application/json;charset=UTF-8")
     public BaseResponse updateShowDoc(@RequestBody @Validated ConfigInfo configInfo) {
         try{
             swagger2ShowDocService.start(configInfo);
