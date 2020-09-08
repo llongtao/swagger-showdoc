@@ -4,8 +4,7 @@
 [![SpringBoot](https://img.shields.io/badge/SpringBoot-2.0.3.RELEASE-brightgreen.svg)](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/)
 
 #### 项目介绍
-公司统一使用ShowDoc记录接口文档,swagger形同虚设,为了避免重复劳动,打算寻找一个工具能把swagger转化为ShowDoc,
-无奈找不到合适的,遂打算自己开发,目前这套已满足日常使用需求
+公司统一使用ShowDoc记录接口文档,为了避免重复劳动打算寻找一款swagger转化为ShowDoc的工具,可是找了很多都没有合适的,于是打算自己开发一个,目前这套已满足日常使用需求
 
 #### 软件架构
 
@@ -21,8 +20,6 @@ JDK 1.8
 4. 你输入的配置会被保存在内存中,在项目重启之前,打开关闭页面你的配置不会丢失
 5. 建议局域网部署,只要不重启你的配置就会一直保存
 
-#### Demo地址
-http://aexp.top:12345/
 
 注:非局域网部署的无法连接到你的局域网,请在自己局域网启动
 
