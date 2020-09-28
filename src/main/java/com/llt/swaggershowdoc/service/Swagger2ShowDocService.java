@@ -20,6 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -79,7 +80,26 @@ public class Swagger2ShowDocService {
             } else {
                 path = "/" + path;
             }
-            URL url = new URL("http", swaggerConfig.getIp(), port, path + "/v2/api-docs");
+            path += "/v2/api-docs";
+            /**
+             * 兼容新版本swaggerui
+             */
+            if(!CollectionUtils.isEmpty(swaggerConfig.getParams())){
+                String params = "";
+                for(String param : swaggerConfig.getParams()){
+                    if(!StringUtils.isEmpty(param)){
+                        if(StringUtils.isEmpty(params)){
+                            params = param;
+                        }else{
+                            params += ("&" + param);
+                        }
+                    }
+                }
+                if(!StringUtils.isEmpty(params)){
+                    path += ("?" + params);
+                }
+            }
+            URL url = new URL("http", swaggerConfig.getIp(), port, path);
             restTemplate.getMessageConverters().set(1,new StringHttpMessageConverter(StandardCharsets.UTF_8));
             Callable<String> callable = () -> restTemplate.getForObject(url.toString(), String.class);
             ExecutorService executor = Executors.newSingleThreadExecutor();
