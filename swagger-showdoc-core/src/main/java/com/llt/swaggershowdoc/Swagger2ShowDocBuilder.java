@@ -4,6 +4,7 @@ import com.llt.swaggershowdoc.config.Config;
 import com.llt.swaggershowdoc.markdownbulider.MarkdownBuilder;
 import com.llt.swaggershowdoc.markdownbulider.constants.FontStyle;
 import com.llt.swaggershowdoc.markdownbulider.constants.MdLevel;
+import com.llt.swaggershowdoc.models.OperationDTO;
 import com.llt.swaggershowdoc.models.PropertyModel;
 import com.llt.swaggershowdoc.models.ShowDocResponse;
 import com.llt.swaggershowdoc.models.Swagger2;
@@ -17,7 +18,9 @@ import io.swagger.models.properties.ArrayProperty;
 import io.swagger.models.properties.Property;
 import io.swagger.models.properties.RefProperty;
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @SuppressWarnings("rawtypes")
@@ -37,13 +40,12 @@ public class Swagger2ShowDocBuilder {
     }
 
 
-    public static void start(Config config)   {
-        config.getSwaggerConfigList().forEach(swaggerConfig-> updateToShowDoc(config, new Swagger2(swaggerConfig.getSwagger()), swaggerConfig.getModule()));
+    public static void start(Config config) {
+        config.getSwaggerConfigList().forEach(swaggerConfig -> updateToShowDoc(config, new Swagger2(swaggerConfig.getSwagger()), swaggerConfig.getModule()));
     }
 
     /**
      * 更新文档到ShowDoc
-     *
      */
     public static void updateToShowDoc(Config config, Swagger swagger, String moduleName) {
 
@@ -90,7 +92,7 @@ public class Swagger2ShowDocBuilder {
                 || null != path.getPatch() && path.getPatch().getTags().contains(tag.getName())
                 || null != path.getHead() && path.getHead().getTags().contains(tag.getName());
         if (contains) {
-            sendToShowDoc(config, moduleName, tag.getName(), getApiDescription(path), generateMd(swagger, apiPath, path) );
+            getOperationMap(path).forEach((summary, operationList) -> sendToShowDoc(config, moduleName, tag.getName(), summary, generateMd(swagger, apiPath, path, summary, operationList)));
         }
     }
 
@@ -98,11 +100,11 @@ public class Swagger2ShowDocBuilder {
      * 将数据发送到ShowDoc
      * url:https://www.showdoc.cc/web/#/page/102098
      *
-     * @param config             showDoc文档信息(必填)
-     * @param catName            当页面文档处于目录下时，请传递目录名（可空）
-     * @param catNameSub         当页面文档处于更细分的子目录下时，请传递子目录名。（可空）
-     * @param pageTitle          页面标题(必填)page_title存在则用内容更新，不存在则创建
-     * @param pageContent        页面内容，可传递markdown格式的文本或者html源码(必填)
+     * @param config      showDoc文档信息(必填)
+     * @param catName     当页面文档处于目录下时，请传递目录名（可空）
+     * @param catNameSub  当页面文档处于更细分的子目录下时，请传递子目录名。（可空）
+     * @param pageTitle   页面标题(必填)page_title存在则用内容更新，不存在则创建
+     * @param pageContent 页面内容，可传递markdown格式的文本或者html源码(必填)
      */
     private static void sendToShowDoc(Config config, String catName, String catNameSub, String pageTitle, String pageContent) {
         Map<String, String> parMap = new HashMap<>();
@@ -151,52 +153,15 @@ public class Swagger2ShowDocBuilder {
     }
 
 
-    private static String generateMd(Swagger swagger, String url, Path swaggerPath) {
+    private static String generateMd(Swagger swagger, String url, Path swaggerPath, String summary, List<OperationDTO> operationList) {
         Map<String, Model> definitions = swagger.getDefinitions();
         Map<String, Path> paths = new HashMap<>();
         paths.put(url, swaggerPath);
 
         swagger.setPaths(paths);
 
-        List<String> methodList = new ArrayList<>();
-        Operation operation = null;
-
-        Operation post = swaggerPath.getPost();
-        Operation get = swaggerPath.getGet();
-        Operation put = swaggerPath.getPut();
-        Operation delete = swaggerPath.getDelete();
-        Operation head = swaggerPath.getHead();
-        Operation patch = swaggerPath.getPatch();
-        Operation options = swaggerPath.getOptions();
-        if (options != null) {
-            methodList.add("OPTIONS");
-            operation = options;
-        }
-        if (head != null) {
-            methodList.add("HEAD");
-            operation = head;
-        }
-        if (patch != null) {
-            methodList.add("PATCH");
-            operation = patch;
-        }
-        if (delete != null) {
-            methodList.add("DELETE");
-            operation = delete;
-        }
-        if (put != null) {
-            methodList.add("PUT");
-            operation = put;
-        }
-        if (get != null) {
-            methodList.add("GET");
-            operation = get;
-        }
-        if (post != null) {
-            methodList.add("POST");
-            operation = post;
-        }
-
+        List<String> methodList = operationList.stream().map(OperationDTO::getMethod).collect(Collectors.toList());
+        Operation operation = operationList.get(0).getOperation();
 
         assert operation != null;
         List<Parameter> parameters = operation.getParameters();
@@ -215,9 +180,9 @@ public class Swagger2ShowDocBuilder {
 
         MarkdownBuilder markdownBuilder = MarkdownBuilder.start();
         markdownBuilder.writeln("简要描述：", FontStyle.BOLD)
-                .writeUnorderedListItem(operation.getSummary()).newLine()
+                .writeUnorderedListItem(summary).newLine()
                 .writeln("请求URL：", FontStyle.BOLD)
-                .writeUnorderedListItem("http://"+swagger.getHost()+url, FontStyle.HIGHLIGHT).newLine()
+                .writeUnorderedListItem("http://" + swagger.getHost() + url, FontStyle.HIGHLIGHT).newLine()
                 .writeln("请求方式：", FontStyle.BOLD)
                 .writeUnorderedList(methodList).newLine()
         ;
@@ -250,9 +215,9 @@ public class Swagger2ShowDocBuilder {
                 }
             }
 
-            if (examples != null ) {
+            if (examples != null) {
                 markdownBuilder.writeln("请求body：", FontStyle.BOLD)
-                        .writeHighlight(Jackson.toJSONString(examples) , "json").newLine();
+                        .writeHighlight(Jackson.toJSONString(examples), "json").newLine();
             }
         }
 
@@ -306,6 +271,26 @@ public class Swagger2ShowDocBuilder {
 
         return markdownBuilder.toString();
     }
+
+    private static Map<String, List<OperationDTO>> getOperationMap(Path swaggerPath) {
+        Map<String, List<OperationDTO>> operationMap = new HashMap<>();
+        putOperation(swaggerPath.getPost(), "POST", operationMap);
+        putOperation(swaggerPath.getGet(), "GET", operationMap);
+        putOperation(swaggerPath.getOptions(), "OPTIONS", operationMap);
+        putOperation(swaggerPath.getPatch(), "PATCH", operationMap);
+        putOperation(swaggerPath.getHead(), "HEAD", operationMap);
+        putOperation(swaggerPath.getDelete(), "DELETE", operationMap);
+        putOperation(swaggerPath.getPut(), "PUT", operationMap);
+        return operationMap;
+    }
+
+    private static void putOperation(Operation operation, String method, Map<String, List<OperationDTO>> operationMap) {
+        if (operation == null) {
+            return;
+        }
+        operationMap.computeIfAbsent(operation.getSummary(),k-> new ArrayList<>()).add(new OperationDTO(operation, method));
+    }
+
 
     private static void buildPropertyList(List<PropertyModel> propertyList, Map<String, Property> properties, List<RefProperty> refPropertyList) {
         if (properties == null) {
