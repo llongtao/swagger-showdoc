@@ -4,23 +4,37 @@
 [![SpringBoot](https://img.shields.io/badge/SpringBoot-2.0.3.RELEASE-brightgreen.svg)](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/)
 
 #### 项目介绍
-公司统一使用ShowDoc记录接口文档,为了避免重复劳动打算寻找一款swagger转化为ShowDoc的工具,可是找了很多都没有合适的,于是打算自己开发一个,目前这套已满足日常使用需求
+公司统一使用ShowDoc记录接口文档,为了避免重复劳动打算寻找一款swagger转化为ShowDoc的工具,可是找了很多都没有合适的,于是打算自己开发一个,目前这套已满足日常使用需求.
 
+提供两种方式生成文档
+1. 启动独立应用页面填写生成,无入侵项目
+2. 应用内嵌,启动项目时生成(可选择关闭)
 #### 软件架构
 
 Spring Boot 2.0.3
 
 JDK 1.8
 
-#### 使用说明
+#### 模块介绍
+##### swagger-showdoc-core
+文档生成器核心模块
+##### swagger-showdoc-server
+独立部署模块,如果选择使用部署该应用可无需引入应用内嵌模块
 
+使用说明:
 1. 运行SwaggerShowDocApplication
 2. 访问http://localhost:12345
 3. 输入参数，点击同步
-4. 你输入的配置会被保存在前端
+4. 你输入的配置会被保存在前端 
 
+注:非局域网部署的无法连接到你的局域网,请在自己局域网部署
+##### swagger-showdoc-spring-boot-starter
+spring-boot内嵌应用模块,一键引入swagger,启动时默认同步文档(可配置)
+##### swagger-showdoc-demo
+使用内嵌模式的spring-boot应用demo
 
-注:非局域网部署的无法连接到你的局域网,请在自己局域网启动
+swagger访问地址http://localhost:12346/swagger-ui
+
 
 ## License
 
