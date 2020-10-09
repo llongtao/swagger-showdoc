@@ -12,7 +12,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @date 2020-09-29
  */
 @EnableSwagger2
-@ComponentScan(basePackages = "com.llt.swaggershowdoc.springboot")
+@ComponentScan(basePackages = "top.aexp.swaggershowdoc.springboot")
 @ConditionalOnProperty(prefix = "swagger-showdoc", name = "enable", havingValue = "true", matchIfMissing = true)
 @Configuration
 @EnableConfigurationProperties({SwaggerShowDocConfig.class})
