@@ -5,7 +5,7 @@
 
     <groupId>top.aexp</groupId>
     <artifactId>swagger-showdoc</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0-RELEASE</version>
     <modules>
         <module>swagger-showdoc-core</module>
         <module>swagger-showdoc-server</module>
