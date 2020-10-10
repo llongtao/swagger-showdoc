@@ -34,16 +34,6 @@
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
             <version>3.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-metadata</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

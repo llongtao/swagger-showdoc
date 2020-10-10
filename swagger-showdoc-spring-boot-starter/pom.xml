@@ -20,32 +20,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>swagger-showdoc-core</artifactId>
             <version>${project.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-metadata</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-boot-starter</artifactId>
-            <version>3.0.0</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-metadata</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.plugin</groupId>
@@ -59,16 +38,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-core</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.springframework.plugin</groupId>
-                    <artifactId>spring-plugin-metadata</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
 

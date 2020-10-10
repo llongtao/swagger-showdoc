@@ -10,7 +10,7 @@
         <module>swagger-showdoc-core</module>
         <module>swagger-showdoc-server</module>
         <module>swagger-showdoc-spring-boot-starter</module>
-        <module>swagger-showdoc-demo</module>
+<!--        <module>swagger-showdoc-demo</module>-->
     </modules>
     <packaging>pom</packaging>
 
@@ -42,7 +42,13 @@
                 <artifactId>spring-plugin-metadata</artifactId>
                 <version>2.0.0.RELEASE</version>
             </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-boot-starter</artifactId>
+                <version>3.0.0</version>
+            </dependency>
         </dependencies>
+
     </dependencyManagement>
 
 
