@@ -1,5 +1,6 @@
 package top.aexp.swaggershowdoc.springboot;
 
+import springfox.documentation.spring.web.SpringfoxWebConfiguration;
 import top.aexp.swaggershowdoc.springboot.config.SwaggerShowDocConfig;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -17,4 +18,5 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableConfigurationProperties({SwaggerShowDocConfig.class})
 public class SwaggerShowDocAutoConfiguration {
+
 }
