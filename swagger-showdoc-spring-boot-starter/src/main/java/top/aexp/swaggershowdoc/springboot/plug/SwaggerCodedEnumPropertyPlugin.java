@@ -130,31 +130,31 @@ public class SwaggerCodedEnumPropertyPlugin implements ModelPropertyBuilderPlugi
 
             String value;
             String desc;
-            try {
-
-                if ("string".equals(valueNamef)) {
+            if ("string".equals(valueNamef)) {
+                value = item.toString();
+            } else {
+                try{
+                    Field valueField = currentClass.getDeclaredField(valueNamef);
+                    valueField.setAccessible(true);
+                    value = valueField.get(item).toString();
+                }catch (Exception e){
+                    log.warn("获取枚举的属性失败, {}", e.getMessage());
                     value = item.toString();
-                } else {
-                    try{
-                        Field valueField = currentClass.getDeclaredField(valueNamef);
-                        valueField.setAccessible(true);
-                        value = valueField.get(item).toString();
-                    }catch (Exception e){
-                        value = item.toString();
-                    }
-
                 }
 
+            }
+
+            try{
                 Field descField = currentClass.getDeclaredField(descNamef);
                 descField.setAccessible(true);
                 desc = descField.get(item).toString();
-            } catch (NoSuchFieldException | IllegalAccessException e) {
-                log.warn("获取枚举的属性和值失败, {}", e.getMessage());
-                return null;
+            }catch (NoSuchFieldException | IllegalAccessException e){
+                log.warn("获取枚举的值失败, {}", e.getMessage());
+                desc = "-";
             }
             exampleValue.set(value);
             return value + ":" + desc;
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+        }).collect(Collectors.toList());
 
 
         String joinText = " (" + String.join("; ", displayValues) + ")";
