@@ -138,7 +138,7 @@ public class SwaggerCodedEnumPropertyPlugin implements ModelPropertyBuilderPlugi
                     valueField.setAccessible(true);
                     value = valueField.get(item).toString();
                 }catch (NoSuchFieldException | IllegalAccessException e){
-                    log.warn("获取{}枚举的属性失败, {}",currentClass, e.getMessage());
+                    log.debug("获取{}枚举的属性失败, {}",currentClass, e.getMessage());
                     value = item.toString();
                 }
 
@@ -149,7 +149,7 @@ public class SwaggerCodedEnumPropertyPlugin implements ModelPropertyBuilderPlugi
                 descField.setAccessible(true);
                 desc = descField.get(item).toString();
             }catch (NoSuchFieldException | IllegalAccessException e){
-                log.warn("获取{}枚举的值失败, {}",currentClass, e.getMessage());
+                log.debug("获取{}枚举的值失败, {}",currentClass, e.getMessage());
                 desc = "-";
             }
             exampleValue.set(value);
