@@ -1,7 +1,7 @@
 # swagger-showdoc
 
 [![License](https://img.shields.io/badge/license-GPL-blue)](https://github.com/llongtao/swagger-showdoc/blob/master/LICENSE)
-[![SpringBoot](https://img.shields.io/badge/SpringBoot-2.1.11.RELEASE-brightgreen.svg)](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/)
+[![SpringBoot](https://img.shields.io/badge/SpringBoot-2.2.0.RELEASE-brightgreen.svg)](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/)
 
 #### 项目介绍
 公司统一使用ShowDoc记录接口文档,为了避免重复劳动打算寻找一款swagger转化为ShowDoc的工具,可是找了很多都没有合适的,于是打算自己开发一个,目前这套已满足日常使用需求.
@@ -11,7 +11,7 @@
 2. 应用内嵌,启动项目时生成(可选择关闭)
 #### 软件架构
 
-Spring Boot 2.0.3
+Spring Boot 2.2.0
 
 JDK 1.8
 
@@ -31,7 +31,7 @@ JDK 1.8
 ##### swagger-showdoc-spring-boot-starter
 spring-boot内嵌应用模块,一键引入swagger,启动时默认同步文档(可配置)
 ##### swagger-showdoc-demo
-使用内嵌模式的spring-boot应用demo
+使用内嵌模式的spring-boot应用demo(2.2以下低版本spring-boot)
 
 swagger访问地址http://localhost:12346/swagger-ui
 
