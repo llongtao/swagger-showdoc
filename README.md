@@ -35,6 +35,56 @@ spring-boot内嵌应用模块,一键引入swagger,启动时默认同步文档(�
 
 swagger访问地址http://localhost:12346/swagger-ui
 
+##### 依赖引入
+            <dependency>
+                <groupId>top.aexp</groupId>
+                <artifactId>swagger-showdoc-spring-boot-starter</artifactId>
+                <version>1.0.0-RELEASE</version>
+            </dependency>
+            
+##### 低版本spring-boot适配 (2.2以下)
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-spring-web</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-spi</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger2</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-swagger-common</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>io.springfox</groupId>
+                <artifactId>springfox-bean-validators</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.plugin</groupId>
+                <artifactId>spring-plugin-core</artifactId>
+                <version>2.0.0.RELEASE</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>org.springframework.plugin</groupId>
+                <artifactId>spring-plugin-metadata</artifactId>
+                <version>2.0.0.RELEASE</version>
+            </dependency>
+
+        </dependencies>
+
+    </dependencyManagement>
 
 ## License
 
