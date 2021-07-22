@@ -92,7 +92,13 @@ public class Swagger2ShowDocBuilder {
                 || null != path.getPatch() && path.getPatch().getTags().contains(tag.getName())
                 || null != path.getHead() && path.getHead().getTags().contains(tag.getName());
         if (contains) {
-            getOperationMap(path).forEach((summary, operationList) -> sendToShowDoc(config, moduleName, tag.getName(), summary, generateMd(swagger, apiPath, path, summary, operationList)));
+            getOperationMap(path).forEach((summary, operationList) -> {
+                try{
+                    sendToShowDoc(config, moduleName, tag.getName(), summary, generateMd(swagger, apiPath, path, summary, operationList));
+                }catch (Exception e){
+                    log.error("文档上传到showdoc失败",e);
+                }
+            });
         }
     }
 
@@ -195,34 +201,37 @@ public class Swagger2ShowDocBuilder {
             }
         }
 
-
-        Map<String, Object> examples = response.getExamples();
-        Model responseSchema1 = response.getResponseSchema();
-        if (responseSchema1 instanceof RefModel) {
-            String simpleRef = ((RefModel) responseSchema1).getSimpleRef();
-            markdownBuilder.write("响应实体：", FontStyle.BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
-            refModelList.add((RefModel) responseSchema1);
-        } else if (responseSchema1 instanceof ArrayModel) {
-            Property items = ((ArrayModel) responseSchema1).getItems();
-            if (items instanceof ArrayProperty) {
-                items = getArrayRefProperty((ArrayProperty) items);
-            }
-            if (items instanceof RefProperty) {
-                String simpleRef = ((RefProperty) items).getSimpleRef();
-                Model model = definitions.get(simpleRef);
-                if (model instanceof RefModel) {
-                    markdownBuilder.write("响应实体：", FontStyle.BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
-                    refModelList.add((RefModel) model);
+        if (response != null) {
+            Map<String, Object> examples = response.getExamples();
+            Model responseSchema1 = response.getResponseSchema();
+            if (responseSchema1 instanceof RefModel) {
+                String simpleRef = ((RefModel) responseSchema1).getSimpleRef();
+                markdownBuilder.write("响应实体：", FontStyle.BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
+                refModelList.add((RefModel) responseSchema1);
+            } else if (responseSchema1 instanceof ArrayModel) {
+                Property items = ((ArrayModel) responseSchema1).getItems();
+                if (items instanceof ArrayProperty) {
+                    items = getArrayRefProperty((ArrayProperty) items);
+                }
+                if (items instanceof RefProperty) {
+                    String simpleRef = ((RefProperty) items).getSimpleRef();
+                    Model model = definitions.get(simpleRef);
+                    if (model instanceof RefModel) {
+                        markdownBuilder.write("响应实体：", FontStyle.BOLD).crossReferenceRaw(null, simpleRef, simpleRef).newLine();
+                        refModelList.add((RefModel) model);
+                    }
                 }
             }
+            if (examples != null) {
+                markdownBuilder.writeln("响应示例", FontStyle.BOLD)
+                        .writeHighlight(Jackson.toJSONString(examples), "json").newLine();
+
+            }
         }
 
 
-        if (examples != null) {
-            markdownBuilder.writeln("响应示例", FontStyle.BOLD)
-                    .writeHighlight(Jackson.toJSONString(examples), "json").newLine();
 
-        }
+
         markdownBuilder.writeTitle("数据模型", MdLevel.THREE);
         markdownBuilder.newLine();
 
@@ -231,16 +240,19 @@ public class Swagger2ShowDocBuilder {
             List<PropertyModel> propertyList = new ArrayList<>();
             String simpleRef = refModel.getSimpleRef();
             Model model = definitions.get(simpleRef);
-            Map<String, Property> properties = model.getProperties();
-            List<RefProperty> refPropertyList = new ArrayList<>();
-            buildPropertyList(propertyList, properties, refPropertyList);
+            if(model!=null){
+                Map<String, Property> properties = model.getProperties();
+                List<RefProperty> refPropertyList = new ArrayList<>();
+                buildPropertyList(propertyList, properties, refPropertyList);
+                Set<String> set = new HashSet<>();
+                set.add(simpleRef);
+                buildRefModelTable(refPropertyList, definitions, markdownBuilder, set);
+            }
 
             markdownBuilder.writeAnchor(simpleRef);
             markdownBuilder.writeln(simpleRef, FontStyle.BOLD);
             markdownBuilder.writeTable(propertyList, TITLE_MAP);
-            Set<String> set = new HashSet<>();
-            set.add(simpleRef);
-            buildRefModelTable(refPropertyList, definitions, markdownBuilder, set);
+
         });
 
         return markdownBuilder.toString();
