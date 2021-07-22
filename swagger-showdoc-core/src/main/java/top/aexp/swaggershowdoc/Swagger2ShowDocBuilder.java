@@ -4,10 +4,7 @@ import top.aexp.swaggershowdoc.config.Config;
 import top.aexp.swaggershowdoc.markdownbulider.MarkdownBuilder;
 import top.aexp.swaggershowdoc.markdownbulider.constants.FontStyle;
 import top.aexp.swaggershowdoc.markdownbulider.constants.MdLevel;
-import top.aexp.swaggershowdoc.models.OperationDTO;
-import top.aexp.swaggershowdoc.models.PropertyModel;
-import top.aexp.swaggershowdoc.models.ShowDocResponse;
-import top.aexp.swaggershowdoc.models.Swagger2;
+import top.aexp.swaggershowdoc.models.*;
 import top.aexp.swaggershowdoc.util.HttpUtil;
 import top.aexp.swaggershowdoc.util.Jackson;
 import io.swagger.models.*;
@@ -148,13 +145,19 @@ public class Swagger2ShowDocBuilder {
         Response response = operation.getResponses().get("200");
 
 
-        List<AbstractSerializableParameter> tableParameterList = new ArrayList<>();
+        List<PropertyModel> tableParameterList = new ArrayList<>();
+        List<PropertyModel> bodyTableParameterList = new ArrayList<>();
         BodyParameter bodyParameter = null;
         for (Parameter parameter : parameters) {
             if (parameter instanceof AbstractSerializableParameter) {
-                tableParameterList.add((AbstractSerializableParameter) parameter);
+                tableParameterList.add(new PropertyModel((AbstractSerializableParameter)parameter) );
             } else if (parameter instanceof BodyParameter) {
-                bodyParameter = (BodyParameter) parameter;
+                BodyParameter bp = (BodyParameter) parameter;
+                if (bp.getSchema() instanceof ModelImpl) {
+                    bodyTableParameterList.add(new PropertyModel(bp,((ModelImpl) bp.getSchema()).getType()));
+                }else {
+                    bodyParameter = bp;
+                }
             }
         }
 
@@ -167,9 +170,13 @@ public class Swagger2ShowDocBuilder {
                 .writeUnorderedList(methodList).newLine()
         ;
 
-        if (tableParameterList.size() != 0) {
+        if (tableParameterList.size() != 0 ) {
             markdownBuilder.writeln("请求参数：", FontStyle.BOLD)
                     .writeTable(tableParameterList, TITLE_MAP).newLine();
+        }
+        if (bodyTableParameterList.size() != 0) {
+            markdownBuilder.writeln("请求参数：", FontStyle.BOLD)
+                    .writeTable(bodyTableParameterList, TITLE_MAP).newLine();
         }
 
         List<RefModel> refModelList = new ArrayList<>();
