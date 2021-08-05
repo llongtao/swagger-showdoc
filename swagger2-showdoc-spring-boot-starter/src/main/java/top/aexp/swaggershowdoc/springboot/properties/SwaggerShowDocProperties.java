@@ -1,4 +1,4 @@
-package top.aexp.swaggershowdoc.springboot.config;
+package top.aexp.swaggershowdoc.springboot.properties;
 
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
@@ -7,26 +7,29 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
-import springfox.documentation.oas.annotations.EnableOpenApi;
+import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+
+import java.util.Collections;
+import java.util.HashSet;
 
 /**
  * @author LILONGTAO
  * @date 2020-09-29
  */
 @Data
-@Component
-@EnableOpenApi
 @ConfigurationProperties(prefix = "swagger-showdoc")
-public class SwaggerShowDocConfig   {
+public class SwaggerShowDocProperties {
 
     private Boolean enable = false;
 
     private Boolean autoSync = true;
 
     private String basePath;
+
+    private String basePkg;
 
     private String host;
 
@@ -49,24 +52,6 @@ public class SwaggerShowDocConfig   {
     }
 
 
-    @Bean
-    public Docket createRestApi() {
 
-        return new Docket(DocumentationType.OAS_30).enable(enable)
-                .host(host)
-                .pathMapping(basePath)
-                .apiInfo(apiInfo())
-                .select()
-                .apis(requestHandler -> requestHandler!=null&&requestHandler.isAnnotatedWith(ApiOperation.class))
-                .paths(PathSelectors.any())
-                .build();
-    }
-    private ApiInfo apiInfo() {
-        return new ApiInfoBuilder()
-                .title(title)
-                .version(version)
-                .termsOfServiceUrl(basePath)
-                .build();
-    }
 
 }

@@ -1,26 +1,25 @@
 package top.aexp.swaggershowdoc.springboot.starter;
 
-import top.aexp.swaggershowdoc.Swagger2ShowDocBuilder;
-import top.aexp.swaggershowdoc.config.Config;
-import top.aexp.swaggershowdoc.springboot.config.SwaggerShowDocConfig;
 import io.swagger.models.Swagger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import springfox.documentation.service.Documentation;
 import springfox.documentation.spring.web.DocumentationCache;
 import springfox.documentation.swagger2.mappers.ServiceModelToSwagger2Mapper;
+import top.aexp.swaggershowdoc.Swagger2ShowDocBuilder;
+import top.aexp.swaggershowdoc.config.Config;
+import top.aexp.swaggershowdoc.springboot.cons.CommonConstants;
+import top.aexp.swaggershowdoc.springboot.properties.SwaggerShowDocProperties;
 
 /**
  * @author LILONGTAO
  * @date 2020-09-29
  */
 @Slf4j
-@DependsOn("swaggerShowDocConfig")
 @Component
 public class AutoSyncStarter implements ApplicationRunner {
 
@@ -32,30 +31,31 @@ public class AutoSyncStarter implements ApplicationRunner {
     private ServiceModelToSwagger2Mapper mapper;
 
     @Autowired
-    private SwaggerShowDocConfig swaggerShowDocConfig;
+    private SwaggerShowDocProperties swaggerShowDocProperties;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        if (!swaggerShowDocConfig.getAutoSync()) {
+        if (!swaggerShowDocProperties.getAutoSync()) {
             log.info("SwaggerShowDoc 不生成文档");
             return;
         }
-        if (!checkConfig(swaggerShowDocConfig)) {
+        if (!checkConfig(swaggerShowDocProperties)) {
             return;
         }
+        //noinspection AlibabaAvoidManuallyCreateThread
         new Thread(() -> {
             log.info("SwaggerShowDoc 开始同步文档");
-            Documentation documentation = this.documentationCache.documentationByGroup("default");
+            Documentation documentation = this.documentationCache.documentationByGroup(CommonConstants.DOC_GROUP);
             if (documentation == null) {
                 log.warn("SwaggerShowDoc documentation isNull");
                 return;
             }
             Swagger swagger = this.mapper.mapDocumentation(documentation);
-            swagger.basePath(swaggerShowDocConfig.getBasePath());
-            swagger.host(swaggerShowDocConfig.getHost());
-            SwaggerShowDocConfig.ShowDoc showDoc = swaggerShowDocConfig.getShowDoc();
+            swagger.basePath(swaggerShowDocProperties.getBasePath());
+            swagger.host(swaggerShowDocProperties.getHost());
+            SwaggerShowDocProperties.ShowDoc showDoc = swaggerShowDocProperties.getShowDoc();
             Config config = new Config(showDoc.getUrl(), showDoc.getApiKey(), showDoc.getApiToken());
-            config.addModule(swaggerShowDocConfig.getModule(), swagger);
+            config.addModule(swaggerShowDocProperties.getModule(), swagger);
             try{
                 Swagger2ShowDocBuilder.start(config);
                 log.info("SwaggerShowDoc 同步文档完成:"+config.getShowDocAddr());
@@ -66,9 +66,9 @@ public class AutoSyncStarter implements ApplicationRunner {
 
     }
 
-    private boolean checkConfig(SwaggerShowDocConfig swaggerShowDocConfig) {
-        String module = swaggerShowDocConfig.getModule();
-        SwaggerShowDocConfig.ShowDoc showDoc = swaggerShowDocConfig.getShowDoc();
+    private boolean checkConfig(SwaggerShowDocProperties swaggerShowDocProperties) {
+        String module = swaggerShowDocProperties.getModule();
+        SwaggerShowDocProperties.ShowDoc showDoc = swaggerShowDocProperties.getShowDoc();
         if (StringUtils.isEmpty(module)) {
             log.warn("SwaggerShowDoc module为空,无法构建");
             return false;

@@ -2,7 +2,7 @@ package top.aexp.swaggershowdoc.markdownbulider;
 
 import top.aexp.swaggershowdoc.markdownbulider.constants.FontStyle;
 import top.aexp.swaggershowdoc.markdownbulider.constants.MdLevel;
-import org.apache.commons.beanutils.BeanUtils;
+import top.aexp.swaggershowdoc.util.BeanUtils;
 
 import java.util.LinkedHashMap;
 import java.util.List;

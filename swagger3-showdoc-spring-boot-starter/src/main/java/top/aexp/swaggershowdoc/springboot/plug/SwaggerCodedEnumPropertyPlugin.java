@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings("rawtypes")
 @Slf4j
-@Primary
 @Component
 public class SwaggerCodedEnumPropertyPlugin implements ModelPropertyBuilderPlugin {
 
@@ -128,7 +127,7 @@ public class SwaggerCodedEnumPropertyPlugin implements ModelPropertyBuilderPlugi
         final List<String> displayValues = Arrays.stream(subItemRecords).filter(Objects::nonNull).map(item -> {
             Class currentClass = item.getClass();
 
-            String value;
+            String value = null;
             String desc;
             try {
 
@@ -149,10 +148,14 @@ public class SwaggerCodedEnumPropertyPlugin implements ModelPropertyBuilderPlugi
                 descField.setAccessible(true);
                 desc = descField.get(item).toString();
             } catch (NoSuchFieldException | IllegalAccessException e) {
-                log.warn("获取枚举的属性和值失败, {}", e.getMessage());
+                log.debug("获取枚举的属性和值失败, {}", e.getMessage());
+                if (value != null) {
+                    exampleValue.set(value);
+                    return value;
+                }
                 return null;
             }
-            exampleValue.set(value);
+
             return value + ":" + desc;
         }).filter(Objects::nonNull).collect(Collectors.toList());
 

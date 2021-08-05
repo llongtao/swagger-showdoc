@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 
 @Slf4j
@@ -32,6 +33,12 @@ public class ApiDocController {
     @RequestMapping("/")
     public String index() {
         return "index.html";
+    }
+
+    @ResponseBody
+    @RequestMapping("/aa")
+    public Optional<Integer> aa() {
+        return Optional.ofNullable(null);
     }
 
     private RestTemplate restTemplate = new RestTemplate();
