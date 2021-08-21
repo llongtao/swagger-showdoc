@@ -49,18 +49,24 @@ swagger访问地址http://localhost:12346/swagger-ui
 ### 应用内嵌方式
 #### 依赖引入
 springboot2.2以下引入
-            <dependency>
-                <groupId>top.aexp</groupId>
-                <artifactId>swagger2-showdoc-spring-boot-starter</artifactId>
-                <version>1.2.0-RELEASE</version>
-            </dependency>
+
+```xml
+<dependency>
+    <groupId>top.aexp</groupId>
+    <artifactId>swagger2-showdoc-spring-boot-starter</artifactId>
+    <version>1.2.0-RELEASE</version>
+</dependency>
+```
 
 springboot2.2及以上引入
-            <dependency>
-                <groupId>top.aexp</groupId>
-                <artifactId>swagger3-showdoc-spring-boot-starter</artifactId>
-                <version>1.2.0-RELEASE</version>
-            </dependency>
+
+```xml
+<dependency>
+    <groupId>top.aexp</groupId>
+    <artifactId>swagger3-showdoc-spring-boot-starter</artifactId>
+    <version>1.2.0-RELEASE</version>
+</dependency>
+```
 
 #### 添加配置
 ```properties
