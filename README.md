@@ -27,64 +27,68 @@ JDK 1.8
 3. 输入参数，点击同步
 4. 你输入的配置会被保存在前端 
 
-注:非局域网部署的无法连接到你的局域网,请在自己局域网部署
-##### swagger-showdoc-spring-boot-starter
-spring-boot内嵌应用模块,一键引入swagger,启动时默认同步文档(可配置)
+注:部署机器必须可以访问业务服务和showdoc服务
+##### swagger2-showdoc-spring-boot-starter
+swagger2版本的spring-boot内嵌应用模块,适用于spring-boot2.2以下版本,可一键引入swagger,启动时默认同步文档(可配置)
+##### swagger3-showdoc-spring-boot-starter
+swagger3版本的spring-boot内嵌应用模块,适用于spring-boot2.2及以上版本,可一键引入swagger,启动时默认同步文档(可配置)
 ##### swagger-showdoc-demo
-使用内嵌模式的spring-boot应用demo(2.2以下低版本spring-boot)
+使用内嵌模式的spring-boot应用demo
 
 swagger访问地址http://localhost:12346/swagger-ui
 
 ##### 依赖引入
             <dependency>
                 <groupId>top.aexp</groupId>
-                <artifactId>swagger-showdoc-spring-boot-starter</artifactId>
-                <version>1.0.0-RELEASE</version>
-            </dependency>
-            
-##### 低版本spring-boot适配 (2.2以下)
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-spring-web</artifactId>
-                <version>3.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-spi</artifactId>
-                <version>3.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger2</artifactId>
-                <version>3.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-swagger-common</artifactId>
-                <version>3.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>io.springfox</groupId>
-                <artifactId>springfox-bean-validators</artifactId>
-                <version>3.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.plugin</groupId>
-                <artifactId>spring-plugin-core</artifactId>
-                <version>2.0.0.RELEASE</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>org.springframework.plugin</groupId>
-                <artifactId>spring-plugin-metadata</artifactId>
-                <version>2.0.0.RELEASE</version>
+                <artifactId>swagger2-showdoc-spring-boot-starter</artifactId>
+                <version>1.2.0-RELEASE</version>
             </dependency>
 
-        </dependencies>
+或
 
-    </dependencyManagement>
+            <dependency>
+                <groupId>top.aexp</groupId>
+                <artifactId>swagger3-showdoc-spring-boot-starter</artifactId>
+                <version>1.2.0-RELEASE</version>
+            </dependency>
+            
+注意swagger3仅支持springboot2.2以上版本
+
+##### 配置详解
+```properties
+#是否启用,可选default false
+swagger-showdoc.enable=true
+
+#是否启用自动同步接口,可选default true
+swagger-showdoc.auto-sync=true
+
+#服务的context-path,最终接口文档url=host+basePath+接口path,可选default /
+swagger-showdoc.base-path=${server.servlet.context-path}
+
+#访问域名,最终接口文档url=host+basePath+接口path,可选default localhost:8080
+swagger-showdoc.host=localhost:${server.port}
+
+#你想生成接口的controller包,可选default *
+swagger-showdoc.base-pkg=top.aexp.swaggershowdoc.demo.controller
+
+#文档标题,显示在swagger的文档标题
+swagger-showdoc.title=测试模块接口文档,可选default null
+
+#文档版本,显示在swagger的文档版本,可选default null
+swagger-showdoc.version=1.0.0
+
+#模块名称,最终会在showdoc生成同名一级目录,若需自动生成文档则必填
+swagger-showdoc.module=测试模块
+
+#showdoc的访问地址,若需自动生成文档则必填
+swagger-showdoc.show-doc.url=192.168.7.28:8000
+
+#showdoc项目设置-开放api里复制api_key,若需自动生成文档则必填
+swagger-showdoc.show-doc.api-key=54b1ac60e55905b026c03465fa9c3c892101069755
+
+#showdoc项目设置-开放api里复制api_token,若需自动生成文档则必填
+swagger-showdoc.show-doc.api-token=4caff69f332ea5a239fae7e6e5a080f31644285862
+```
 
 ## License
 

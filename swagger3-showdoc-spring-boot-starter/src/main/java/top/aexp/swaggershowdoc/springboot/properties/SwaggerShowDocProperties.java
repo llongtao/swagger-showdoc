@@ -32,7 +32,7 @@ public class SwaggerShowDocProperties {
 
     private String basePkg;
 
-    private String host;
+    private String host="localhost:8080";
 
     private String title;
 

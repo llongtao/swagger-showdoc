@@ -19,8 +19,8 @@
         </dependency>
         <dependency>
             <groupId>top.aexp</groupId>
-            <artifactId>swagger-showdoc-spring-boot-starter</artifactId>
-            <version>1.2.0-SNAPSHOT</version>
+            <artifactId>swagger2-showdoc-spring-boot-starter</artifactId>
+            <version>1.2.0-RELEASE</version>
         </dependency>
 
     </dependencies>
