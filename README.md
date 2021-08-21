@@ -4,7 +4,7 @@
 [![SpringBoot](https://img.shields.io/badge/SpringBoot-2.2.0.RELEASE-brightgreen.svg)](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/)
 
 #### 项目介绍
-公司统一使用ShowDoc记录接口文档,为了避免重复劳动打算寻找一款swagger转化为ShowDoc的工具,可是找了很多都没有合适的,于是打算自己开发一个,目前这套已满足日常使用需求.
+公司统一使用ShowDoc记录接口文档,为了避免重复劳动打算寻找一款swagger转化为ShowDoc的工具,可是市面上并没有找到合适的,新版ShowDoc自带的导入非常难用,于是打算自己开发一个,目前这套已满足日常使用需求,解放大家双手深受欢迎
 
 提供两种方式生成文档
 1. 启动独立应用页面填写生成,无入侵项目
