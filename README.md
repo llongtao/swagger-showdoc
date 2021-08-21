@@ -1,24 +1,25 @@
-# swagger-showdoc
+[toc]
+## swagger-showdoc
 
 [![License](https://img.shields.io/badge/license-GPL-blue)](https://github.com/llongtao/swagger-showdoc/blob/master/LICENSE)
 [![SpringBoot](https://img.shields.io/badge/SpringBoot-2.2.0.RELEASE-brightgreen.svg)](https://docs.spring.io/spring-boot/docs/2.0.3.RELEASE/reference/htmlsingle/)
 
-#### 项目介绍
+## 项目介绍
 公司统一使用ShowDoc记录接口文档,为了避免重复劳动打算寻找一款swagger转化为ShowDoc的工具,可是市面上并没有找到合适的,新版ShowDoc自带的导入非常难用,于是打算自己开发一个,目前这套已满足日常使用需求,解放大家双手深受欢迎
 
 提供两种方式生成文档
 1. 启动独立应用页面填写生成,无入侵项目
 2. 应用内嵌,启动项目时生成(可选择关闭)
-#### 软件架构
+## 软件架构
 
 Spring Boot 2.2.0
 
 JDK 1.8
 
-#### 模块介绍
-##### swagger-showdoc-core
+## 模块介绍
+### swagger-showdoc-core
 文档生成器核心模块
-##### swagger-showdoc-server
+### swagger-showdoc-server
 独立部署模块,如果选择使用部署该应用可无需引入应用内嵌模块
 
 使用说明:
@@ -28,33 +29,40 @@ JDK 1.8
 4. 你输入的配置会被保存在前端 
 
 注:部署机器必须可以访问业务服务和showdoc服务
-##### swagger2-showdoc-spring-boot-starter
+### swagger2-showdoc-spring-boot-starter
 swagger2版本的spring-boot内嵌应用模块,适用于spring-boot2.2以下版本,可一键引入swagger,启动时默认同步文档(可配置)
-##### swagger3-showdoc-spring-boot-starter
+### swagger3-showdoc-spring-boot-starter
 swagger3版本的spring-boot内嵌应用模块,适用于spring-boot2.2及以上版本,可一键引入swagger,启动时默认同步文档(可配置)
-##### swagger-showdoc-demo
+### swagger-showdoc-demo
 使用内嵌模式的spring-boot应用demo
 
 swagger访问地址http://localhost:12346/swagger-ui
 
-##### 依赖引入
+## 使用方式
+### 独立应用方式
+
+1. 运行swagger-showdoc-server模块的SwaggerShowDocApplication
+2. 访问http://localhost:12345
+3. 输入参数，点击同步
+4. 你输入的配置会被保存在前端 
+
+### 应用内嵌方式
+#### 依赖引入
+springboot2.2以下引入
             <dependency>
                 <groupId>top.aexp</groupId>
                 <artifactId>swagger2-showdoc-spring-boot-starter</artifactId>
                 <version>1.2.0-RELEASE</version>
             </dependency>
 
-或
-
+springboot2.2及以上引入
             <dependency>
                 <groupId>top.aexp</groupId>
                 <artifactId>swagger3-showdoc-spring-boot-starter</artifactId>
                 <version>1.2.0-RELEASE</version>
             </dependency>
-            
-注意swagger3仅支持springboot2.2以上版本
 
-##### 配置详解
+#### 添加配置
 ```properties
 #是否启用,可选default false
 swagger-showdoc.enable=true
