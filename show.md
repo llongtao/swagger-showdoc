@@ -23,7 +23,7 @@
   "data" : {
     "expiredAt" : "",
     "token" : "string",
-	"uid":"string"
+    "uid":"string"
   },
   "messageCode" : "string",
   "message" : "string",
