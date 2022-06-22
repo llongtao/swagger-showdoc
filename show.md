@@ -2,7 +2,7 @@
 - 微信登录
 
 **请求URL：**
-- `http://api.aexp.top/auth/api/v2/user/auth/wxLogin`
+- `http://api.aexp.top/auth/api/v2/wxLogin`
 
 **请求方式：**
 - POST
