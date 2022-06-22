@@ -11,8 +11,9 @@
 1. 启动独立应用页面填写生成,无入侵项目
 2. 应用内嵌,启动项目时生成(可选择关闭)
 
-## 生成文档示例
-https://github.com/llongtao/swagger-showdoc/edit/master/show.md
+
+[生成文档示例]([https://github.com/llongtao/swagger-showdoc/stargazers](https://github.com/llongtao/swagger-showdoc/blob/master/show.md)) 
+
 
 ## 软件架构
 
