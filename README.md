@@ -49,6 +49,10 @@ swagger访问地址http://localhost:12346/swagger-ui
 2. 访问http://localhost:12345
 3. 输入参数，点击同步
 4. 你输入的配置会被保存在前端 
+```
+#如需部署使用此命令打包
+mvn package -pl swagger-showdoc-server -am
+```
 
 ### 应用内嵌方式
 #### 依赖引入
