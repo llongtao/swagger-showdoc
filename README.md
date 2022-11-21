@@ -53,7 +53,7 @@ springboot2.2以下引入
 
 ```
 #推送自己仓库
-mvn clean  package -pl swagger2-showdoc-spring-boot-starter -am
+mvn clean  package deploy -pl swagger2-showdoc-spring-boot-starter -am
 ```
 
 ```xml
@@ -68,7 +68,7 @@ springboot2.2及以上引入
 
 ```
 #推送自己仓库
-mvn clean  package -pl swagger2-showdoc-spring-boot-starter -am
+mvn clean  package  deploy -pl swagger3-showdoc-spring-boot-starter -am
 ```
 
 ```xml
