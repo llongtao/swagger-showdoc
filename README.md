@@ -26,13 +26,6 @@ JDK 1.8
 ### swagger-showdoc-server
 独立部署模块,如果选择使用部署该应用可无需引入应用内嵌模块
 
-使用说明:
-1. 运行SwaggerShowDocApplication
-2. 访问http://localhost:12345
-3. 输入参数，点击同步
-4. 你输入的配置会被保存在前端 
-
-注:部署机器必须可以访问业务服务和showdoc服务
 ### swagger2-showdoc-spring-boot-starter
 swagger2版本的spring-boot内嵌应用模块,适用于spring-boot2.2以下版本,可一键引入swagger,启动时默认同步文档(可配置)
 ### swagger3-showdoc-spring-boot-starter
