@@ -44,12 +44,17 @@ swagger访问地址http://localhost:12346/swagger-ui
 4. 你输入的配置会被保存在前端 
 ```
 #如需部署使用此命令打包
-mvn package -pl swagger-showdoc-server -am
+mvn clean package -pl swagger-showdoc-server -am
 ```
 
 ### 应用内嵌方式
 #### 依赖引入
 springboot2.2以下引入
+
+```
+#推送自己仓库
+mvn clean  package -pl swagger2-showdoc-spring-boot-starter -am
+```
 
 ```xml
 <dependency>
@@ -60,6 +65,11 @@ springboot2.2以下引入
 ```
 
 springboot2.2及以上引入
+
+```
+#推送自己仓库
+mvn clean  package -pl swagger2-showdoc-spring-boot-starter -am
+```
 
 ```xml
 <dependency>
