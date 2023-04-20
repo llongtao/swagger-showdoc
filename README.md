@@ -79,6 +79,11 @@ mvn clean  package  deploy -pl swagger3-showdoc-spring-boot-starter -am
 </dependency>
 ```
 
+```
+启动类添加
+@EnableSwaggerShowDoc
+```
+
 #### 添加配置
 ```properties
 #是否启用,可选default false
