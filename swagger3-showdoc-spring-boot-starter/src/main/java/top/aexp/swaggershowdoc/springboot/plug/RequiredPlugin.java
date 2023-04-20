@@ -52,6 +52,7 @@ public class RequiredPlugin implements ModelPropertyBuilderPlugin {
 
 
     boolean extractAnnotation(ModelPropertyContext context,Class aClass) {
-        return context.getAnnotatedElement().map(element -> element.isAnnotationPresent(aClass)).orElse(false);
+        Optional<Boolean> aBoolean = context.getAnnotatedElement().map(element -> element.isAnnotationPresent(aClass));
+        return aBoolean.orElse(false);
     }
 }
